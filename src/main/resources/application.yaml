@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      username: kscrapper_core_root
+      password: kscrapper_core_pass
+      database: kscrapper_core_db
+      authentication-database: admin
+      auto-index-creation: true
