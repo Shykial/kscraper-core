@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-data class ScrapeRecipe(
+data class ScrapingRecipe(
     @Indexed(unique = true)
     val domainName: String,
     val extractingDetails: Map<String, ExtractingDetails>,

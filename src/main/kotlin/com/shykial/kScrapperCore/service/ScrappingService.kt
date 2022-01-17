@@ -1,6 +1,9 @@
 package com.shykial.kScrapperCore.service
 
-import com.shykial.kScrapperCore.model.entity.*
+import com.shykial.kScrapperCore.model.entity.Attribute
+import com.shykial.kScrapperCore.model.entity.ExtractingDetails
+import com.shykial.kScrapperCore.model.entity.OwnText
+import com.shykial.kScrapperCore.model.entity.Text
 import com.shykial.kScrapperCore.repository.ScrapeRecipeRepository
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.AsyncFetcher
@@ -16,7 +19,6 @@ private val domainPartRegex = Regex("(?<=//).*?(?=/)")
 
 class ScrappingService(private val scrapeRecipeRepository: ScrapeRecipeRepository) {
     private val log = KotlinLogging.logger { }
-
 
     suspend fun scrapeUrl(productUrl: String, scrapingFields: List<String>? = null) = coroutineScope {
         log.info("Scraping url $productUrl for fields $scrapingFields")
