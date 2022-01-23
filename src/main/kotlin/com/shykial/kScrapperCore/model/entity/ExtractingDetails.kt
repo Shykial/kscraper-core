@@ -1,26 +1,22 @@
 package com.shykial.kScrapperCore.model.entity
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-data class ScrapingRecipe(
-    @Indexed(unique = true)
-    val domainName: String,
-    val extractingDetails: Map<String, ExtractingDetails>,
-    val requestHeaders: Map<String, String>? = null,
-    val requestTimeout: Int? = null,
-) {
-    @Id
-    var id: String? = null
-}
-
 data class ExtractingDetails(
+    @Indexed
+    val domainId: String,
+    val fieldName: String,
     val selector: Selector,
     val extractedProperty: ExtractedProperty,
-    val regexReplacements: List<RegexReplacement> = listOf(defaultRegexReplacement),
-)
+    val regexReplacements: List<RegexReplacement>? = listOf(defaultRegexReplacement),
+) {
+    @Id
+    val id: String = ObjectId.get().toHexString()
+}
 
 private val priceFilterRegex = Regex("""[^\d,.]""")
 private val defaultRegexReplacement = RegexReplacement(priceFilterRegex, "")

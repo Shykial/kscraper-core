@@ -1,15 +1,16 @@
 package com.shykial.kScrapperCore.model.dto
 
-data class ScrapeRecipeRequest(
-    val domainName: String,
-    val extractingDetails: Map<String, ExtractingDetailsRequest>
+data class ExtractingDetailsRequest(
+    val domainId: String,
+    val extractedFieldDetails: List<ExtractedFieldDetails>,
 )
 
-data class ExtractingDetailsRequest(
+data class ExtractedFieldDetails(
+    val fieldName: String,
     val selector: SelectorRequest,
     val extractedPropertyType: ExtractedPropertyType,
     val extractedPropertyValue: String? = null,
-    val regexReplacements: Map<String, String>? = null
+    val base64EncodedRegexReplacements: Map<String, String>? = null,
 )
 
 data class SelectorRequest(

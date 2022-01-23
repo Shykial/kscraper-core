@@ -6,3 +6,6 @@ spring:
       database: kscrapper_core_db
       authentication-database: admin
       auto-index-creation: true
+logging:
+  level:
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG

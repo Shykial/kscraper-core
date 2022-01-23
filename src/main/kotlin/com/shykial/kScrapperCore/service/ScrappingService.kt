@@ -4,63 +4,67 @@ import com.shykial.kScrapperCore.model.entity.Attribute
 import com.shykial.kScrapperCore.model.entity.ExtractingDetails
 import com.shykial.kScrapperCore.model.entity.OwnText
 import com.shykial.kScrapperCore.model.entity.Text
-import com.shykial.kScrapperCore.repository.ScrapeRecipeRepository
+import com.shykial.kScrapperCore.repository.ExtractingDetailsRepository
+import com.shykial.kScrapperCore.repository.DomainRequestDetailsRepository
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.AsyncFetcher
 import it.skrape.fetcher.response
 import it.skrape.fetcher.skrape
 import it.skrape.selects.Doc
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import java.time.Instant
 
 private val domainPartRegex = Regex("(?<=//).*?(?=/)")
 
-class ScrappingService(private val scrapeRecipeRepository: ScrapeRecipeRepository) {
+@Service
+class ScrappingService(
+    private val DomainRequestDetailsRepository: DomainRequestDetailsRepository,
+    private val extractingDetailsRepository: ExtractingDetailsRepository,
+) {
     private val log = KotlinLogging.logger { }
 
-    suspend fun scrapeUrl(productUrl: String, scrapingFields: List<String>? = null) = coroutineScope {
-        log.info("Scraping url $productUrl for fields $scrapingFields")
-        scrapeRecipeRepository.findByDomainName(productUrl.domainPart()).awaitSingle().run {
-            skrape(AsyncFetcher) {
-                request {
-                    url = productUrl
-                    requestHeaders?.let { headers = it }
-                    requestTimeout?.let { timeout = it }
-                }
-                response {
-                    htmlDocument {
-                        val scrappedFields = scrapingFields?.associateWith { field ->
-                            extractingDetails[field]?.let {
-                                extractDetails(it)
-                            } ?: "Scraping recipe not present for field $field"
-                        } ?: extractingDetails.mapValues { extractDetails(it.value) }
-
-                        ScrappedData(
-                            url = productUrl,
-                            scrappedFields = scrappedFields
-                        )
-                    }
+    suspend fun scrapeUrl(productUrl: String, scrapedFields: List<String>? = null) = coroutineScope {
+        log.info("Scraping url $productUrl for fields $scrapedFields")
+        val domainDetails = DomainRequestDetailsRepository.findByDomainName(productUrl.domainPart()).awaitSingle()
+        val extractingDetails = (scrapedFields?.let {
+            extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)
+        } ?: extractingDetailsRepository.findByDomainId(domainDetails.id)).asFlow().toList()
+        skrape(AsyncFetcher) {
+            request {
+                url = productUrl
+                domainDetails.requestHeaders?.let { headers = it }
+                domainDetails.requestTimeoutInMillis?.let { timeout = it }
+            }
+            response {
+                htmlDocument {
+                    ScrappedData(
+                        url = productUrl,
+                        scrappedFields = extractingDetails.associate(::extractDetails)
+                    )
                 }
             }
         }
     }
 }
 
-private fun Doc.extractDetails(extractingDetails: ExtractingDetails) = with(extractingDetails) {
-    selector.run {
-        if (index == -1) findLast(value) else findByIndex(index, value)
-    }.run {
+private fun Doc.extractDetails(extractingDetails: ExtractingDetails): Pair<String, String> = with(extractingDetails) {
+    val element = selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
+    val elementText = element.run {
         when (extractedProperty) {
             is Attribute -> attribute(extractedProperty.attributeName)
             OwnText -> ownText
             Text -> text
         }
-    }.run {
-        regexReplacements.fold(this) { current, replacement ->
+    }
+    fieldName to elementText.run {
+        regexReplacements?.fold(this) { current, replacement ->
             current.replace(replacement.regex, replacement.replacement)
-        }
+        } ?: this
     }
 }
 
