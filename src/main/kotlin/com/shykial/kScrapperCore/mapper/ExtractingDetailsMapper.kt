@@ -1,13 +1,18 @@
 package com.shykial.kScrapperCore.mapper
 
 import com.shykial.kScrapperCore.exception.InvalidInputException
-import com.shykial.kScrapperCore.model.dto.ExtractedPropertyType
-import com.shykial.kScrapperCore.model.dto.ExtractingDetailsRequest
-import com.shykial.kScrapperCore.model.dto.SelectorRequest
-import com.shykial.kScrapperCore.model.entity.*
+import com.shykial.kScrapperCore.model.entity.Attribute
+import com.shykial.kScrapperCore.model.entity.ExtractingDetails
+import com.shykial.kScrapperCore.model.entity.OwnText
+import com.shykial.kScrapperCore.model.entity.RegexReplacement
+import com.shykial.kScrapperCore.model.entity.Selector
+import com.shykial.kScrapperCore.model.entity.Text
+import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
+import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import org.bson.internal.Base64
+import generated.com.shykial.kScrapperCore.models.Selector as SelectorRequest
 
-fun ExtractingDetailsRequest.toEntities() = extractedFieldDetails.map {
+fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
     ExtractingDetails(
         domainId = domainId,
         fieldName = it.fieldName,
@@ -31,7 +36,8 @@ private fun extractedPropertyFrom(extractedPropertyType: ExtractedPropertyType, 
     when (extractedPropertyType) {
         ExtractedPropertyType.TEXT -> Text
         ExtractedPropertyType.OWN_TEXT -> OwnText
-        ExtractedPropertyType.ATTRIBUTE -> Attribute(extractedPropertyValue
-            ?: throw InvalidInputException("No value property value provided for Attribute property type")
+        ExtractedPropertyType.ATTRIBUTE -> Attribute(
+            extractedPropertyValue
+                ?: throw InvalidInputException("No value property value provided for Attribute property type")
         )
     }

@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+tags:
+  - name: Extracting Details
+    description: Operations related to extracting details
+  - name: Domain Request Details
+    description: Operations related to domain request details
+paths:
+  /extracing-details:
+    post:
+      tags:
+        - Extracting Details
+      operationId: addExtractingDetails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractingDetailsRequest'
+      responses:
+        201:
+          description: Created
+
+  /domain-request-details:
+    post:
+      tags:
+        - Domain Request Details
+      operationId: addDomainRequestDetails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainRequestDetailsRequest'
+      responses:
+        201:
+          description: Created
+
+components:
+  schemas:
+    ExtractingDetailsRequest:
+      type: object
+      properties:
+        domainId:
+          type: string
+        extractedFieldsDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtractedFieldDetails'
+      required:
+        - domainId
+        - extractedFieldsDetails
+
+    ExtractedFieldDetails:
+      type: object
+      properties:
+        fieldName:
+          type: string
+        selector:
+          $ref: '#/components/schemas/Selector'
+        extractedPropertyType:
+          $ref: '#/components/schemas/ExtractedPropertyType'
+        extractedPropertyValue:
+          type: string
+        base64EncodedRegexReplacements:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - fieldName
+        - selector
+        - extractedPropertyType
+
+    Selector:
+      type: object
+      properties:
+        value:
+          type: string
+        index:
+          type: integer
+      required:
+        - value
+        - index
+
+    ExtractedPropertyType:
+      type: string
+      enum:
+        - TEXT
+        - OWN_TEXT
+        - ATTRIBUTE
+
+    DomainRequestDetailsRequest:
+      type: object
+      properties:
+        domainName:
+          type: string
+        requestHeaders:
+          type: object
+          additionalProperties:
+            type: string
+        requestTimeoutInMillis:
+          type: integer
+      required:
+        - domainName
