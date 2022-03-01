@@ -56,6 +56,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.compileKotlin {
+    dependsOn(tasks.openApiGenerate)
+}
+
 val generatedResourcesDir = "$buildDir/generated-resources"
 
 kotlin.sourceSets["main"].kotlin.srcDir("$generatedResourcesDir/src/main/kotlin")

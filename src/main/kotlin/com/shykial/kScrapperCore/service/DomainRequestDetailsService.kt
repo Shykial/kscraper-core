@@ -1,9 +1,9 @@
 package com.shykial.kScrapperCore.service
 
 import com.shykial.kScrapperCore.mapper.toEntity
-import com.shykial.kScrapperCore.model.dto.DomainRequestDetailsRequest
 import com.shykial.kScrapperCore.model.entity.DomainRequestDetails
 import com.shykial.kScrapperCore.repository.DomainRequestDetailsRepository
+import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import kotlinx.coroutines.reactor.awaitSingle
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
