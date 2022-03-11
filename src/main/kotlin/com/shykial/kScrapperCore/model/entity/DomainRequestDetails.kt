@@ -13,5 +13,8 @@ data class DomainRequestDetails(
     val requestTimeoutInMillis: Int? = null,
 ) {
     @Id
-    val id: String = ObjectId.get().toHexString()
+    private var _id: String = ObjectId.get().toHexString()
+
+    val id
+        get() = _id
 }

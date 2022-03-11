@@ -15,7 +15,7 @@ class DomainRequestDetailsService(
     private val log = KotlinLogging.logger { }
 
     suspend fun addDomainRequestDetails(domainRequestDetailsRequest: DomainRequestDetailsRequest): DomainRequestDetails =
-        domainRequestDetailsRequest.also {
-            log.info("Saving domainRequestDetails for domain ${it.domainName}")
-        }.run { domainRequestDetailsRepository.save(toEntity()).awaitSingle() }
+        domainRequestDetailsRequest
+            .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
+            .toEntity().run(domainRequestDetailsRepository::save).awaitSingle()
 }

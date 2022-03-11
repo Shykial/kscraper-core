@@ -1,5 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val coroutinesVersion = "1.6.0"
+val restAssuredVersion = "4.5.1"
+val testContainersVersion = "1.16.3"
+
 plugins {
     id("org.springframework.boot") version "2.6.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
@@ -25,18 +29,25 @@ extra["testcontainersVersion"] = "1.16.2"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+//    implementation("org.hibernate.validator:hibernate-validator:7.0.3.Final")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("it.skrape:skrapeit:1.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$coroutinesVersion")
+    implementation("it.skrape:skrapeit:1.2.1")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
+    testImplementation("org.testcontainers:mongodb:$testContainersVersion")
+    testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
 }
 
 dependencyManagement {
