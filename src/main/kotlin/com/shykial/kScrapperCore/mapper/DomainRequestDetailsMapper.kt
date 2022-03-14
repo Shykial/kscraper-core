@@ -11,6 +11,7 @@ fun DomainRequestDetailsRequest.toEntity() = DomainRequestDetails(
 )
 
 fun DomainRequestDetails.toResponse() = DomainRequestDetailsResponse(
+    id = id,
     domainName = domainName,
     requestHeaders = requestHeaders,
     requestTimeoutInMillis = requestTimeoutInMillis

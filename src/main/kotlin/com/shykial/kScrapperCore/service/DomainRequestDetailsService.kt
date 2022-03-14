@@ -20,8 +20,10 @@ class DomainRequestDetailsService(
         domainRequestDetailsRepository.findByDomainName(domainName).awaitSingleOrNull()
             ?: throw NotFoundException("Domain request details not found for domain $domainName")
 
-    suspend fun addDomainRequestDetails(domainRequestDetailsRequest: DomainRequestDetailsRequest): DomainRequestDetails =
-        domainRequestDetailsRequest
-            .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
-            .toEntity().run(domainRequestDetailsRepository::save).awaitSingle()
+    suspend fun addDomainRequestDetails(
+        domainRequestDetailsRequest: DomainRequestDetailsRequest
+    ): DomainRequestDetails = domainRequestDetailsRequest
+        .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
+        .toEntity()
+        .run(domainRequestDetailsRepository::save).awaitSingle()
 }

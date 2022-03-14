@@ -11,7 +11,7 @@ tags:
   - name: Domain Request Details
     description: Operations related to domain request details
 paths:
-  /extracing-details:
+  /extracting-details:
     post:
       tags:
         - Extracting Details
@@ -25,6 +25,10 @@ paths:
       responses:
         201:
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractingDetailsResponse'
 
   /domain-request-details:
     get:
@@ -34,6 +38,8 @@ paths:
       parameters:
         - name: domainName
           in: query
+          description: domain name, should not contain neither http(s) part or www
+          example: "google.com"
           schema:
             type: string
           required: true
@@ -57,6 +63,10 @@ paths:
       responses:
         201:
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainRequestDetailsResponse'
 
 components:
   schemas:
@@ -72,6 +82,29 @@ components:
       required:
         - domainId
         - extractedFieldsDetails
+
+    ExtractingDetailsResponse:
+      type: object
+      properties:
+        domainId:
+          type: string
+        extractedFieldsDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtractedFieldDetailsResponse'
+      required:
+        - domainId
+        - extractedFieldsDetails
+
+    ExtractedFieldDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: string
+      allOf:
+        - $ref: '#/components/schemas/ExtractedFieldDetails'
+      required:
+        - id
 
     ExtractedFieldDetails:
       type: object
@@ -126,8 +159,14 @@ components:
         - domainName
 
     DomainRequestDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: string
       allOf:
         - $ref: '#/components/schemas/DomainRequestDetailsRequest'
+      required:
+        - id
 
     ErrorResponse:
       type: object

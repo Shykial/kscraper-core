@@ -16,6 +16,7 @@ import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import io.restassured.http.ContentType
+import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
@@ -27,12 +28,18 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
+private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "/domain-request-details"
+
 @SpringBootTest
 internal class DomainRequestDetailsControllerTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
-) : MongoDBStarter, RestTest() {
+) : RestTest(), MongoDBStarter {
+
+    init {
+        RestAssuredWebTestClient.basePath = DOMAIN_REQUEST_DETAILS_ENDPOINT
+    }
 
     @BeforeEach
     fun setup() {
@@ -50,7 +57,7 @@ internal class DomainRequestDetailsControllerTest(
             Given {
                 queryParam("domainName", entity.domainName)
             } When {
-                get("/domain-request-details")
+                get()
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -68,7 +75,7 @@ internal class DomainRequestDetailsControllerTest(
                 contentType(ContentType.JSON)
                 body(request.toJsonString())
             } When {
-                post("/domain-request-details")
+                post()
             } Then {
                 status(HttpStatus.CREATED)
             }
@@ -86,7 +93,7 @@ internal class DomainRequestDetailsControllerTest(
             Given {
                 queryParam("domainName", randomAlphanumeric(20))
             } When {
-                get("/domain-request-details")
+                get()
             } Then {
                 status(HttpStatus.NOT_FOUND)
                 extractingBody<ErrorResponse> {
@@ -104,7 +111,7 @@ internal class DomainRequestDetailsControllerTest(
                 contentType(ContentType.JSON)
                 body(request.toJsonString())
             } When {
-                post("/domain-request-details")
+                post()
             } Then {
                 status(HttpStatus.CONFLICT)
             }

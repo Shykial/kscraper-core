@@ -85,7 +85,6 @@ openApiGenerate {
             "enumPropertyNaming" to "UPPERCASE",
             "delegatePattern" to "true",
             "reactive" to "true",
-            "useBeanValidation" to "false"
         )
     )
 }

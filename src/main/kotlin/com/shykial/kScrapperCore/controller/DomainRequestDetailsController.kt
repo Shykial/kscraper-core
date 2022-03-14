@@ -1,6 +1,7 @@
 package com.shykial.kScrapperCore.controller
 
 import com.shykial.kScrapperCore.common.toResponseEntity
+import com.shykial.kScrapperCore.extensions.runSuspend
 import com.shykial.kScrapperCore.mapper.toResponse
 import com.shykial.kScrapperCore.service.DomainRequestDetailsService
 import generated.com.shykial.kScrapperCore.apis.DomainRequestDetailsApi
@@ -22,10 +23,10 @@ class DomainRequestDetailsController(
     }
 
     override suspend fun addDomainRequestDetails(
-        domainRequestDetailsRequest: DomainRequestDetailsRequest
-    ): ResponseEntity<Unit> {
-        log.info("Received addDomainRequestDetails request for domain: ${domainRequestDetailsRequest.domainName}")
-        domainRequestDetailsService.addDomainRequestDetails(domainRequestDetailsRequest)
-        return ResponseEntity(HttpStatus.CREATED)
-    }
+        domainRequestDetailsRequest: DomainRequestDetailsRequest,
+    ): ResponseEntity<DomainRequestDetailsResponse> = domainRequestDetailsRequest
+        .also { log.info("Received addDomainRequestDetails request for domain: ${domainRequestDetailsRequest.domainName}") }
+        .runSuspend(domainRequestDetailsService::addDomainRequestDetails)
+        .toResponse()
+        .toResponseEntity(HttpStatus.CREATED)
 }
