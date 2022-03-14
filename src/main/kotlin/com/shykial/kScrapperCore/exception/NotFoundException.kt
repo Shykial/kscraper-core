@@ -2,7 +2,7 @@ package com.shykial.kScrapperCore.exception
 
 import org.springframework.http.HttpStatus
 
-class InvalidInputException(
+class NotFoundException(
     message: String,
     cause: Throwable? = null
-) : BaseAppException(message, cause, HttpStatus.BAD_REQUEST)
+) : BaseAppException(message, cause, HttpStatus.NOT_FOUND)

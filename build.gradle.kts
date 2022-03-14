@@ -18,20 +18,14 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-        name = "ktor-eap"
-    }
 }
 
-extra["testcontainersVersion"] = "1.16.2"
+extra["testcontainersVersion"] = testContainersVersion
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
-//    implementation("org.hibernate.validator:hibernate-validator:7.0.3.Final")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -41,13 +35,17 @@ dependencies {
     implementation("it.skrape:skrapeit:1.2.1")
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:mongodb:$testContainersVersion")
+    testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
+    testImplementation("io.rest-assured:xml-path:$restAssuredVersion")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
+    testImplementation("io.rest-assured:kotlin-extensions:$restAssuredVersion")
 }
 
 dependencyManagement {
@@ -58,7 +56,7 @@ dependencyManagement {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
         jvmTarget = "17"
     }
 }
@@ -86,7 +84,8 @@ openApiGenerate {
             "useTags" to "true",
             "enumPropertyNaming" to "UPPERCASE",
             "delegatePattern" to "true",
-            "reactive" to "true"
+            "reactive" to "true",
+            "useBeanValidation" to "false"
         )
     )
 }

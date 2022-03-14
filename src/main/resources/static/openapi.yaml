@@ -27,6 +27,23 @@ paths:
           description: Created
 
   /domain-request-details:
+    get:
+      tags:
+        - Domain Request Details
+      operationId: findDomainRequestDetails
+      parameters:
+        - name: domainName
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainRequestDetailsResponse'
     post:
       tags:
         - Domain Request Details
@@ -107,3 +124,23 @@ components:
           type: integer
       required:
         - domainName
+
+    DomainRequestDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/DomainRequestDetailsRequest'
+
+    ErrorResponse:
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum:
+            - INVALID_INPUT
+            - INTERNAL_SEVER_ERROR
+            - NOT_FOUND
+            - DUPLICATE_DATA
+        errorMessage:
+          type: string
+      required:
+        - errorType
+        - errorMessage

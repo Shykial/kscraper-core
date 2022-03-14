@@ -18,5 +18,4 @@ interface MongoDBStarter {
             registry.add("$mongoProperties.uri") { mongoDBContainer.replicaSetUrl }
         }
     }
-
 }

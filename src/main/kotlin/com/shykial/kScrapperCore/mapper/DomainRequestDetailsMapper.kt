@@ -2,8 +2,15 @@ package com.shykial.kScrapperCore.mapper
 
 import com.shykial.kScrapperCore.model.entity.DomainRequestDetails
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
+import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 
 fun DomainRequestDetailsRequest.toEntity() = DomainRequestDetails(
+    domainName = domainName,
+    requestHeaders = requestHeaders,
+    requestTimeoutInMillis = requestTimeoutInMillis
+)
+
+fun DomainRequestDetails.toResponse() = DomainRequestDetailsResponse(
     domainName = domainName,
     requestHeaders = requestHeaders,
     requestTimeoutInMillis = requestTimeoutInMillis
