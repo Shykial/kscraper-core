@@ -8,7 +8,7 @@ import com.shykial.kScrapperCore.model.entity.OwnText
 import com.shykial.kScrapperCore.model.entity.RegexReplacement
 import com.shykial.kScrapperCore.model.entity.Selector
 import com.shykial.kScrapperCore.model.entity.Text
-import generated.com.shykial.kScrapperCore.models.ExtractedFieldDetailsResponse
+import generated.com.shykial.kScrapperCore.models.AddExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
@@ -32,18 +32,9 @@ fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
     )
 }
 
-suspend fun Flow<ExtractingDetails>.toResponse() = toList()
-    .groupBy(ExtractingDetails::domainId)
-    .entries.single().let { (domainId, extractingDetails) ->
-        ExtractingDetailsResponse(
-            domainId = domainId,
-            extractedFieldsDetails = extractingDetails.map(ExtractingDetails::toExtractedFieldDetailsResponse)
-        )
-    }
-
-private fun ExtractingDetails.toExtractedFieldDetailsResponse(): ExtractedFieldDetailsResponse {
+fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
     val (extractedPropertyType, extractedPropertyValue) = extractedProperty.toResponsePair()
-    return ExtractedFieldDetailsResponse(
+    return ExtractingDetailsResponse(
         id = id,
         fieldName = fieldName,
         selector = SelectorInResponse(value = selector.value, index = selector.index),
@@ -55,11 +46,20 @@ private fun ExtractingDetails.toExtractedFieldDetailsResponse(): ExtractedFieldD
     )
 }
 
+suspend fun Flow<ExtractingDetails>.toResponse() = toList()
+    .groupBy(ExtractingDetails::domainId)
+    .entries.single().let { (domainId, extractingDetails) ->
+        AddExtractingDetailsResponse(
+            domainId = domainId,
+            extractedFieldsDetails = extractingDetails.map { it.toExtractingDetailsResponse() }
+        )
+    }
+
 private fun ExtractedProperty.toResponsePair() =
     when (this) {
         is Attribute -> ExtractedPropertyType.ATTRIBUTE to attributeName
-        OwnText -> ExtractedPropertyType.OWN_TEXT to null
-        Text -> ExtractedPropertyType.TEXT to null
+        is OwnText -> ExtractedPropertyType.OWN_TEXT to null
+        is Text -> ExtractedPropertyType.TEXT to null
     }
 
 private fun SelectorInResponse.toEntityModel() = Selector(

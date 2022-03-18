@@ -1,3 +1,5 @@
+package com.shykial.kScrapperCore.config.libraryBugFixes
+
 import org.springframework.core.KotlinReflectionParameterNameDiscoverer
 import org.springframework.core.ParameterNameDiscoverer
 import java.lang.reflect.Constructor

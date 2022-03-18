@@ -1,7 +1,5 @@
 package com.shykial.kScrapperCore.model.entity
 
-import org.bson.types.ObjectId
-import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -13,10 +11,7 @@ data class ExtractingDetails(
     val selector: Selector,
     val extractedProperty: ExtractedProperty,
     val regexReplacements: List<RegexReplacement>? = listOf(defaultRegexReplacement),
-) {
-    @Id
-    val id: String = ObjectId.get().toHexString()
-}
+) : BaseDocument()
 
 private val priceFilterRegex = Regex("""[^\d,.]""")
 private val defaultRegexReplacement = RegexReplacement(priceFilterRegex, "")

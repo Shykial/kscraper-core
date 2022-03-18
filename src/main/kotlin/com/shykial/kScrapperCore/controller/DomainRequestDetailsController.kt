@@ -17,6 +17,12 @@ class DomainRequestDetailsController(
     private val domainRequestDetailsService: DomainRequestDetailsService,
 ) : DomainRequestDetailsApi {
     private val log = KotlinLogging.logger { }
+
+    override suspend fun findDomainRequestDetailsById(id: String): ResponseEntity<DomainRequestDetailsResponse> {
+        log.info("Received getDomainRequestDetails request for domainRequestDetailsId: $id")
+        return domainRequestDetailsService.findByDomainRequestDetailsId(id).toResponse().toResponseEntity()
+    }
+
     override suspend fun findDomainRequestDetails(domainName: String): ResponseEntity<DomainRequestDetailsResponse> {
         log.info("Received getDomainRequestDetails request for domainName $domainName")
         return domainRequestDetailsService.findByDomainName(domainName).toResponse().toResponseEntity()

@@ -11,7 +11,48 @@ tags:
   - name: Domain Request Details
     description: Operations related to domain request details
 paths:
+  /extracting-details/{id}:
+    get:
+      tags:
+        - Extracting Details
+      operationId: findExtractingDetailsById
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractingDetailsResponse'
+
   /extracting-details:
+    get:
+      tags:
+        - ExtractingDetails
+      operationId: findExtractingDetails
+      parameters:
+        - name: domainId
+          in: query
+          schema:
+            type: string
+          required: true
+        - name: fieldNames
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          required: false
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtractingDetailsResponse'
     post:
       tags:
         - Extracting Details
@@ -28,7 +69,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExtractingDetailsResponse'
+                $ref: '#/components/schemas/AddExtractingDetailsResponse'
+
+  /domain-request-details/{id}:
+    get:
+      tags:
+        - Domain Request Details
+      operationId: findDomainRequestDetailsById
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainRequestDetailsResponse'
 
   /domain-request-details:
     get:
@@ -83,7 +139,7 @@ components:
         - domainId
         - extractedFieldsDetails
 
-    ExtractingDetailsResponse:
+    AddExtractingDetailsResponse:
       type: object
       properties:
         domainId:
@@ -91,12 +147,12 @@ components:
         extractedFieldsDetails:
           type: array
           items:
-            $ref: '#/components/schemas/ExtractedFieldDetailsResponse'
+            $ref: '#/components/schemas/ExtractingDetailsResponse'
       required:
         - domainId
         - extractedFieldsDetails
 
-    ExtractedFieldDetailsResponse:
+    ExtractingDetailsResponse:
       type: object
       properties:
         id:
@@ -183,3 +239,10 @@ components:
       required:
         - errorType
         - errorMessage
+  parameters:
+    Id:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true

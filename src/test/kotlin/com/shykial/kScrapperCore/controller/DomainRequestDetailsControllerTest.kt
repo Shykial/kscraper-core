@@ -15,6 +15,7 @@ import com.shykial.kScrapperCore.starter.MongoDBStarter
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
+import generated.com.shykial.kScrapperCore.models.ErrorResponse.ErrorType
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.reactor.awaitSingle
@@ -50,7 +51,7 @@ internal class DomainRequestDetailsControllerTest(
     inner class PositiveOutcome {
 
         @Test
-        fun `should find domain request details by domain name`() = runTest {
+        fun `should properly retrieve domain request details by domain name on GET request`() = runTest {
             val entity = sampleDomainRequestDetails
             domainRequestDetailsRepository.save(entity).awaitSingle()
 
@@ -78,10 +79,11 @@ internal class DomainRequestDetailsControllerTest(
                 post()
             } Then {
                 status(HttpStatus.CREATED)
+                extractingBody<DomainRequestDetailsResponse> {
+                    val entity = domainRequestDetailsRepository.findByDomainName(request.domainName).block()!!
+                    assertThat(it).isEqualTo(entity.toResponse())
+                }
             }
-
-            domainRequestDetailsRepository.findByDomainName(request.domainName).awaitSingle()
-                .let { assertThat(it).isEqualTo(request.toEntity()) }
         }
     }
 
@@ -97,7 +99,7 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.NOT_FOUND)
                 extractingBody<ErrorResponse> {
-                    assertThat(it.errorType).isEqualTo(ErrorResponse.ErrorType.NOT_FOUND)
+                    assertThat(it.errorType).isEqualTo(ErrorType.NOT_FOUND)
                 }
             }
         }

@@ -16,6 +16,10 @@ class DomainRequestDetailsService(
 ) {
     private val log = KotlinLogging.logger { }
 
+    suspend fun findByDomainRequestDetailsId(domainRequestDetailsId: String): DomainRequestDetails =
+        domainRequestDetailsRepository.findById(domainRequestDetailsId).awaitSingleOrNull()
+            ?: throw NotFoundException("Domain request details not found for ID $domainRequestDetailsId")
+
     suspend fun findByDomainName(domainName: String): DomainRequestDetails =
         domainRequestDetailsRepository.findByDomainName(domainName).awaitSingleOrNull()
             ?: throw NotFoundException("Domain request details not found for domain $domainName")
@@ -23,7 +27,7 @@ class DomainRequestDetailsService(
     suspend fun addDomainRequestDetails(
         domainRequestDetailsRequest: DomainRequestDetailsRequest
     ): DomainRequestDetails = domainRequestDetailsRequest
-        .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
         .toEntity()
+        .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
         .run(domainRequestDetailsRepository::save).awaitSingle()
 }

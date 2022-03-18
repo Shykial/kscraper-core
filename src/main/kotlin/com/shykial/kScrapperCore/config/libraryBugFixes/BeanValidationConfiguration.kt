@@ -1,3 +1,5 @@
+package com.shykial.kScrapperCore.config.libraryBugFixes
+
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.boot.validation.MessageInterpolatorFactory
 import org.springframework.context.annotation.Bean
