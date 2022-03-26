@@ -1,6 +1,8 @@
 package com.shykial.kScrapperCore.mapper
 
 import com.shykial.kScrapperCore.exception.InvalidInputException
+import com.shykial.kScrapperCore.helpers.decodeBase64
+import com.shykial.kScrapperCore.helpers.toBase64String
 import com.shykial.kScrapperCore.model.entity.Attribute
 import com.shykial.kScrapperCore.model.entity.ExtractedProperty
 import com.shykial.kScrapperCore.model.entity.ExtractingDetails
@@ -14,7 +16,6 @@ import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import org.bson.internal.Base64
 import generated.com.shykial.kScrapperCore.models.Selector as SelectorInResponse
 
 fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
@@ -25,7 +26,7 @@ fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
         extractedProperty = extractedPropertyFrom(it.extractedPropertyType, it.extractedPropertyValue),
         regexReplacements = it.base64EncodedRegexReplacements?.map { (key, value) ->
             RegexReplacement(
-                regex = Regex(String(Base64.decode(key))),
+                regex = Regex(decodeBase64(key)),
                 replacement = value
             )
         }
@@ -41,7 +42,7 @@ fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
         extractedPropertyType = extractedPropertyType,
         extractedPropertyValue = extractedPropertyValue,
         base64EncodedRegexReplacements = regexReplacements?.associate {
-            String(Base64.decode(it.regex.pattern)) to it.replacement
+            it.regex.pattern.toBase64String() to it.replacement
         }
     )
 }

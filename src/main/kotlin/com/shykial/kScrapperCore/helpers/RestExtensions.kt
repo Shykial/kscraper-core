@@ -1,4 +1,4 @@
-package com.shykial.kScrapperCore.common
+package com.shykial.kScrapperCore.helpers
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

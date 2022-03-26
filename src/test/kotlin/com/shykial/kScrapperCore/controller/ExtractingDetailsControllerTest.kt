@@ -7,6 +7,7 @@ import com.shykial.kScrapperCore.helpers.Then
 import com.shykial.kScrapperCore.helpers.When
 import com.shykial.kScrapperCore.helpers.awaitAndAssertEmpty
 import com.shykial.kScrapperCore.helpers.extractingBody
+import com.shykial.kScrapperCore.helpers.toBase64String
 import com.shykial.kScrapperCore.mapper.toEntities
 import com.shykial.kScrapperCore.mapper.toExtractingDetailsResponse
 import com.shykial.kScrapperCore.repository.ExtractingDetailsRepository
@@ -24,7 +25,6 @@ import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.assertj.core.api.Assertions.assertThat
-import org.bson.internal.Base64
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -126,10 +126,10 @@ private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(
                 if (it == ExtractedPropertyType.ATTRIBUTE) randomAlphabetic(10) else null
             },
             base64EncodedRegexReplacements = (0..Random.nextInt(0..5)).associate {
-                randomAlphanumeric(10).toBase64String() to randomAlphabetic(10)
+                sampleRegex().toBase64String() to randomAlphabetic(10)
             }
         )
     }
 )
 
-private fun String.toBase64String() = Base64.encode(toByteArray())
+private fun sampleRegex() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""

@@ -4,8 +4,8 @@ import com.shykial.kScrapperCore.model.entity.Attribute
 import com.shykial.kScrapperCore.model.entity.ExtractingDetails
 import com.shykial.kScrapperCore.model.entity.OwnText
 import com.shykial.kScrapperCore.model.entity.Text
-import com.shykial.kScrapperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScrapperCore.repository.DomainRequestDetailsRepository
+import com.shykial.kScrapperCore.repository.ExtractingDetailsRepository
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.AsyncFetcher
 import it.skrape.fetcher.response
@@ -31,9 +31,11 @@ class ScrappingService(
     suspend fun scrapeUrl(productUrl: String, scrapedFields: List<String>? = null) = coroutineScope {
         log.info("Scraping url $productUrl for fields $scrapedFields")
         val domainDetails = DomainRequestDetailsRepository.findByDomainName(productUrl.domainPart()).awaitSingle()
-        val extractingDetails = (scrapedFields?.let {
-            extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)
-        } ?: extractingDetailsRepository.findByDomainId(domainDetails.id)).asFlow().toList()
+        val extractingDetails = (
+            scrapedFields?.let {
+                extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)
+            } ?: extractingDetailsRepository.findByDomainId(domainDetails.id)
+            ).asFlow().toList()
         skrape(AsyncFetcher) {
             request {
                 url = productUrl
@@ -62,8 +64,8 @@ private fun Doc.extractDetails(extractingDetails: ExtractingDetails): Pair<Strin
         }
     }
     fieldName to elementText.run {
-        regexReplacements?.fold(this) { current, replacement ->
-            current.replace(replacement.regex, replacement.replacement)
+        regexReplacements?.fold(this) { current, (regex, replacement) ->
+            current.replace(regex, replacement)
         } ?: this
     }
 }

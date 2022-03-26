@@ -40,6 +40,7 @@ infix fun WebTestClientResponse.Then(block: ValidatableWebTestClientResponse.() 
             forceDisableEagerAssert()
         }
     )
+    .also { it.log().all() }
     .apply(block)
     .also(
         doIfValidatableResponseImpl {
