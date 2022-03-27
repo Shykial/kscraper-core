@@ -1,6 +1,6 @@
 @file:Suppress("TestFunctionName")
 
-package com.shykial.kScrapperCore.helpers
+package com.shykial.kScrapperCore.helper
 
 import io.restassured.common.mapper.TypeRef
 import io.restassured.internal.ResponseSpecificationImpl

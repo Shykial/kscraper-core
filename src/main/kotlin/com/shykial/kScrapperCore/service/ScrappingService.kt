@@ -57,8 +57,8 @@ class ScrappingService(
 private fun Doc.extractDetails(extractingDetails: ExtractingDetails): Pair<String, String> = with(extractingDetails) {
     val element = selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
     val elementText = element.run {
-        when (extractedProperty) {
-            is Attribute -> attribute(extractedProperty.attributeName)
+        when (val extractedPropertyState = extractedProperty) {
+            is Attribute -> attribute(extractedPropertyState.attributeName)
             OwnText -> ownText
             Text -> text
         }

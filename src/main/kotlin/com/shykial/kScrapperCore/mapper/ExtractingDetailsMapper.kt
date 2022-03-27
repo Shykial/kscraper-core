@@ -1,8 +1,8 @@
 package com.shykial.kScrapperCore.mapper
 
 import com.shykial.kScrapperCore.exception.InvalidInputException
-import com.shykial.kScrapperCore.helpers.decodeBase64
-import com.shykial.kScrapperCore.helpers.toBase64String
+import com.shykial.kScrapperCore.helper.decodeBase64
+import com.shykial.kScrapperCore.helper.toBase64String
 import com.shykial.kScrapperCore.model.entity.Attribute
 import com.shykial.kScrapperCore.model.entity.ExtractedProperty
 import com.shykial.kScrapperCore.model.entity.ExtractingDetails
@@ -14,9 +14,11 @@ import generated.com.shykial.kScrapperCore.models.AddExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
+import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import generated.com.shykial.kScrapperCore.models.Selector as SelectorInResponse
+import generated.com.shykial.kScrapperCore.models.RegexReplacement as RegexReplacementInApi
+import generated.com.shykial.kScrapperCore.models.Selector as SelectorInApi
 
 fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
     ExtractingDetails(
@@ -24,12 +26,7 @@ fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
         fieldName = it.fieldName,
         selector = it.selector.toEntityModel(),
         extractedProperty = extractedPropertyFrom(it.extractedPropertyType, it.extractedPropertyValue),
-        regexReplacements = it.base64EncodedRegexReplacements?.map { (key, value) ->
-            RegexReplacement(
-                regex = Regex(decodeBase64(key)),
-                replacement = value
-            )
-        }
+        regexReplacements = it.regexReplacements?.map { rr -> rr.toEntityModel() }?.toMutableList()
     )
 }
 
@@ -38,12 +35,10 @@ fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
     return ExtractingDetailsResponse(
         id = id,
         fieldName = fieldName,
-        selector = SelectorInResponse(value = selector.value, index = selector.index),
+        selector = SelectorInApi(value = selector.value, index = selector.index),
         extractedPropertyType = extractedPropertyType,
         extractedPropertyValue = extractedPropertyValue,
-        base64EncodedRegexReplacements = regexReplacements?.associate {
-            it.regex.pattern.toBase64String() to it.replacement
-        }
+        regexReplacements = regexReplacements?.map { it.toApiModel() }
     )
 }
 
@@ -56,6 +51,23 @@ suspend fun Flow<ExtractingDetails>.toResponse() = toList()
         )
     }
 
+fun ExtractingDetails.updateWith(request: ExtractingDetailsUpdateRequest) = apply {
+    fieldName = request.fieldName
+    selector = request.selector.toEntityModel()
+    extractedProperty = extractedPropertyFrom(request.extractedPropertyType, request.extractedPropertyValue)
+    regexReplacements = request.regexReplacements?.map { it.toEntityModel() }?.toMutableList()
+}
+
+private fun RegexReplacementInApi.toEntityModel() = RegexReplacement(
+    regex = decodeBase64(base64EncodedRegex).toRegex(),
+    replacement = replacement
+)
+
+private fun RegexReplacement.toApiModel() = RegexReplacementInApi(
+    base64EncodedRegex = regex.pattern.toBase64String(),
+    replacement = replacement
+)
+
 private fun ExtractedProperty.toResponsePair() =
     when (this) {
         is Attribute -> ExtractedPropertyType.ATTRIBUTE to attributeName
@@ -63,7 +75,8 @@ private fun ExtractedProperty.toResponsePair() =
         is Text -> ExtractedPropertyType.TEXT to null
     }
 
-private fun SelectorInResponse.toEntityModel() = Selector(
+
+private fun SelectorInApi.toEntityModel() = Selector(
     value = value,
     index = index
 )

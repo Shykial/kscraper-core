@@ -1,4 +1,4 @@
-package com.shykial.kScrapperCore.helpers
+package com.shykial.kScrapperCore.helper
 
 import org.bson.internal.Base64
 

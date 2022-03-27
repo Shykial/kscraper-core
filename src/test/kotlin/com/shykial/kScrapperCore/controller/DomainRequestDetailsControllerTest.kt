@@ -1,12 +1,12 @@
 package com.shykial.kScrapperCore.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.shykial.kScrapperCore.helpers.Given
-import com.shykial.kScrapperCore.helpers.RestTest
-import com.shykial.kScrapperCore.helpers.Then
-import com.shykial.kScrapperCore.helpers.When
-import com.shykial.kScrapperCore.helpers.awaitAndAssertNull
-import com.shykial.kScrapperCore.helpers.extractingBody
+import com.shykial.kScrapperCore.helper.Given
+import com.shykial.kScrapperCore.helper.RestTest
+import com.shykial.kScrapperCore.helper.Then
+import com.shykial.kScrapperCore.helper.When
+import com.shykial.kScrapperCore.helper.awaitAndAssertNull
+import com.shykial.kScrapperCore.helper.extractingBody
 import com.shykial.kScrapperCore.mapper.toEntity
 import com.shykial.kScrapperCore.mapper.toResponse
 import com.shykial.kScrapperCore.model.entity.DomainRequestDetails

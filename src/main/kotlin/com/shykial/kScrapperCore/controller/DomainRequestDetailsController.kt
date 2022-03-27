@@ -1,7 +1,7 @@
 package com.shykial.kScrapperCore.controller
 
-import com.shykial.kScrapperCore.extensions.runSuspend
-import com.shykial.kScrapperCore.helpers.toResponseEntity
+import com.shykial.kScrapperCore.extension.runSuspend
+import com.shykial.kScrapperCore.helper.toResponseEntity
 import com.shykial.kScrapperCore.mapper.toResponse
 import com.shykial.kScrapperCore.service.DomainRequestDetailsService
 import generated.com.shykial.kScrapperCore.apis.DomainRequestDetailsApi

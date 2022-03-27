@@ -1,15 +1,22 @@
 package com.shykial.kScrapperCore.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.shykial.kScrapperCore.helpers.Given
-import com.shykial.kScrapperCore.helpers.RestTest
-import com.shykial.kScrapperCore.helpers.Then
-import com.shykial.kScrapperCore.helpers.When
-import com.shykial.kScrapperCore.helpers.awaitAndAssertEmpty
-import com.shykial.kScrapperCore.helpers.extractingBody
-import com.shykial.kScrapperCore.helpers.toBase64String
+import com.shykial.kScrapperCore.helper.Given
+import com.shykial.kScrapperCore.helper.RestTest
+import com.shykial.kScrapperCore.helper.Then
+import com.shykial.kScrapperCore.helper.When
+import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
+import com.shykial.kScrapperCore.helper.awaitAndAssertEmpty
+import com.shykial.kScrapperCore.helper.decodeBase64
+import com.shykial.kScrapperCore.helper.extractingBody
+import com.shykial.kScrapperCore.helper.toBase64String
 import com.shykial.kScrapperCore.mapper.toEntities
 import com.shykial.kScrapperCore.mapper.toExtractingDetailsResponse
+import com.shykial.kScrapperCore.model.entity.Attribute
+import com.shykial.kScrapperCore.model.entity.ExtractingDetails
+import com.shykial.kScrapperCore.model.entity.OwnText
+import com.shykial.kScrapperCore.model.entity.RegexReplacement
+import com.shykial.kScrapperCore.model.entity.Selector
 import com.shykial.kScrapperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScrapperCore.starter.MongoDBStarter
 import generated.com.shykial.kScrapperCore.models.AddExtractingDetailsResponse
@@ -17,7 +24,7 @@ import generated.com.shykial.kScrapperCore.models.ExtractedFieldDetails
 import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
-import generated.com.shykial.kScrapperCore.models.Selector
+import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.reactor.awaitSingle
@@ -35,6 +42,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 import kotlin.random.Random
 import kotlin.random.nextInt
+import generated.com.shykial.kScrapperCore.models.RegexReplacement as RegexReplacementInApi
+import generated.com.shykial.kScrapperCore.models.Selector as SelectorInApi
 
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
@@ -111,6 +120,51 @@ internal class ExtractingDetailsControllerTest(
                 }
             }
         }
+
+        @Test
+        fun `should properly update extracting details on PUT request`() = runTest {
+            val initialRegexString = sampleRegexString()
+            val initialExtractingDetails = ExtractingDetails(
+                domainId = "sampleDomainId",
+                fieldName = "sampleFieldName",
+                selector = Selector(value = "sampleSelector", index = 0),
+                extractedProperty = OwnText,
+                regexReplacements = mutableListOf(
+                    RegexReplacement(initialRegexString.toRegex(), "replacement")
+                )
+            ).also { extractingDetailsRepository.save(it).awaitSingle() }
+            val updateRequest = ExtractingDetailsUpdateRequest(
+                fieldName = initialExtractingDetails.fieldName,
+                selector = with(initialExtractingDetails.selector) { SelectorInApi(value = value, index = index + 1) },
+                extractedPropertyType = ExtractedPropertyType.ATTRIBUTE,
+                extractedPropertyValue = "newValue",
+                regexReplacements = listOf(
+                    RegexReplacementInApi(initialRegexString.toBase64String(), "replacement"),
+                    RegexReplacementInApi("newRegex".toBase64String(), "newReplacement")
+                )
+            )
+
+            Given {
+                contentType(ContentType.JSON)
+                body(updateRequest.toJsonString())
+            } When {
+                put("/${initialExtractingDetails.id}")
+            } Then {
+                status(HttpStatus.NO_CONTENT)
+
+                extractingDetailsRepository.findById(initialExtractingDetails.id).block()!!.run {
+                    assertFieldsToBeEqual(
+                        fieldName to updateRequest.fieldName,
+                        selector.index to updateRequest.selector.index,
+                        selector.value to updateRequest.selector.value,
+                        extractedProperty to Attribute(updateRequest.extractedPropertyValue!!),
+                    )
+                    assertThat(regexReplacements)
+                        .usingComparatorForType(regexComparator, RegexReplacement::class.java)
+                        .isEqualTo(updateRequest.regexReplacements?.toListInEntity())
+                }
+            }
+        }
     }
 }
 
@@ -120,16 +174,24 @@ private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(
         val extractedPropertyType = ExtractedPropertyType.values().random()
         ExtractedFieldDetails(
             fieldName = randomAlphabetic(10),
-            selector = Selector(value = randomAlphabetic(4), index = Random.nextInt(2)),
+            selector = SelectorInApi(value = randomAlphabetic(4), index = Random.nextInt(2)),
             extractedPropertyType = extractedPropertyType,
             extractedPropertyValue = extractedPropertyType.let {
                 if (it == ExtractedPropertyType.ATTRIBUTE) randomAlphabetic(10) else null
             },
-            base64EncodedRegexReplacements = (0..Random.nextInt(0..5)).associate {
-                sampleRegex().toBase64String() to randomAlphabetic(10)
+            regexReplacements = List(Random.nextInt(0..5)) {
+                RegexReplacementInApi(sampleRegexString().toBase64String(), randomAlphabetic(10))
             }
         )
     }
 )
 
-private fun sampleRegex() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""
+private val regexComparator = Comparator<RegexReplacement> { first, second ->
+    first.regex.pattern compareTo second.regex.pattern
+}.then { first, second -> first.replacement compareTo second.replacement }
+
+private fun sampleRegexString() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""
+
+private fun List<RegexReplacementInApi>.toListInEntity() = map {
+    RegexReplacement(decodeBase64(it.base64EncodedRegex).toRegex(), it.replacement)
+}

@@ -1,4 +1,4 @@
-package com.shykial.kScrapperCore.helpers
+package com.shykial.kScrapperCore.helper
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.module.webtestclient.RestAssuredWebTestClient

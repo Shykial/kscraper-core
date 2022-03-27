@@ -25,6 +25,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExtractingDetailsResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Extracting Details
+      operationId: updateExtractingDetails
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractingDetailsUpdateRequest'
+      responses:
+        204:
+          description: No content
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /extracting-details:
     get:
@@ -53,6 +86,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExtractingDetailsResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
         - Extracting Details
@@ -70,6 +109,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddExtractingDetailsResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /domain-request-details/{id}:
     get:
@@ -85,6 +130,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /domain-request-details:
     get:
@@ -106,6 +157,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
         - Domain Request Details
@@ -123,6 +180,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -138,6 +201,11 @@ components:
       required:
         - domainId
         - extractedFieldsDetails
+
+    ExtractingDetailsUpdateRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ExtractedFieldDetails'
 
     AddExtractingDetailsResponse:
       type: object
@@ -173,10 +241,11 @@ components:
           $ref: '#/components/schemas/ExtractedPropertyType'
         extractedPropertyValue:
           type: string
-        base64EncodedRegexReplacements:
-          type: object
-          additionalProperties:
-            type: string
+        regexReplacements:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegexReplacement'
+
       required:
         - fieldName
         - selector
@@ -223,6 +292,17 @@ components:
         - $ref: '#/components/schemas/DomainRequestDetailsRequest'
       required:
         - id
+
+    RegexReplacement:
+      type: object
+      properties:
+        base64EncodedRegex:
+          type: string
+        replacement:
+          type: string
+      required:
+        - base64EncodedRegex
+        - replacement
 
     ErrorResponse:
       type: object

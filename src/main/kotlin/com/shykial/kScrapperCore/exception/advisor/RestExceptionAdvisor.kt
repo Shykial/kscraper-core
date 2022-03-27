@@ -2,7 +2,7 @@ package com.shykial.kScrapperCore.exception.advisor
 
 import com.shykial.kScrapperCore.exception.DuplicateDataException
 import com.shykial.kScrapperCore.exception.NotFoundException
-import com.shykial.kScrapperCore.helpers.toResponseEntity
+import com.shykial.kScrapperCore.helper.toResponseEntity
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse.ErrorType
 import org.springframework.dao.DuplicateKeyException

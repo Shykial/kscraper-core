@@ -3,24 +3,24 @@ package com.shykial.kScrapperCore.model.entity
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
+private val PRICE_FILTER_REGEX = Regex("""[^\d,.]""")
+private val DEFAULT_REGEX_REPLACEMENT = RegexReplacement(PRICE_FILTER_REGEX, "")
+
 @Document
 data class ExtractingDetails(
     @Indexed
     val domainId: String,
-    val fieldName: String,
-    val selector: Selector,
-    val extractedProperty: ExtractedProperty,
-    val regexReplacements: List<RegexReplacement>? = listOf(defaultRegexReplacement),
+    var fieldName: String,
+    var selector: Selector,
+    var extractedProperty: ExtractedProperty,
+    var regexReplacements: MutableList<RegexReplacement>? = mutableListOf(DEFAULT_REGEX_REPLACEMENT),
 ) : BaseDocument()
-
-private val priceFilterRegex = Regex("""[^\d,.]""")
-private val defaultRegexReplacement = RegexReplacement(priceFilterRegex, "")
 
 sealed interface ExtractedProperty
 
 object Text : ExtractedProperty
 object OwnText : ExtractedProperty
-class Attribute(val attributeName: String) : ExtractedProperty
+data class Attribute(val attributeName: String) : ExtractedProperty
 
 data class Selector(
     val value: String,
