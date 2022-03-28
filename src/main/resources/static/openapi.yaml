@@ -26,11 +26,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExtractingDetailsResponse'
         404:
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
+
     put:
       tags:
         - Extracting Details
@@ -47,17 +44,9 @@ paths:
         204:
           description: No content
         400:
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         404:
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
 
   /extracting-details:
     get:
@@ -87,11 +76,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/ExtractingDetailsResponse'
         404:
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
+
     post:
       tags:
         - Extracting Details
@@ -110,11 +96,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AddExtractingDetailsResponse'
         400:
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
 
   /domain-request-details/{id}:
     get:
@@ -131,11 +113,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         404:
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Domain Request Details
+      operationId: updateDomainRequestDetails
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainRequestDetailsRequest'
+      responses:
+        204:
+          description: No content
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /domain-request-details:
     get:
@@ -158,11 +156,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         404:
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Domain Request Details
@@ -181,11 +175,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         400:
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
 
 components:
   schemas:
@@ -326,3 +316,18 @@ components:
       schema:
         type: string
       required: true
+
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

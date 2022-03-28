@@ -5,6 +5,7 @@ import com.shykial.kScrapperCore.helper.Given
 import com.shykial.kScrapperCore.helper.RestTest
 import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
+import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
 import com.shykial.kScrapperCore.helper.awaitAndAssertNull
 import com.shykial.kScrapperCore.helper.extractingBody
 import com.shykial.kScrapperCore.mapper.toEntity
@@ -80,8 +81,36 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<DomainRequestDetailsResponse> {
-                    val entity = domainRequestDetailsRepository.findByDomainName(request.domainName).block()!!
+                    val entity = domainRequestDetailsRepository.findByDomainName(request.domainName).awaitSingle()
                     assertThat(it).isEqualTo(entity.toResponse())
+                }
+            }
+        }
+
+        @Test
+        fun `should properly update domain request details on PUT request`() = runTest {
+            val initialDomainRequestDetails = sampleDomainRequestDetails
+                .run(domainRequestDetailsRepository::save).awaitSingle()
+            val updateRequest = DomainRequestDetailsRequest(
+                domainName = initialDomainRequestDetails.domainName,
+                requestHeaders = initialDomainRequestDetails.requestHeaders?.plus("newHeader" to "newValue"),
+                requestTimeoutInMillis = 5000
+            )
+
+            Given {
+                contentType(ContentType.JSON)
+                body(updateRequest.toJsonString())
+            } When {
+                put("/${initialDomainRequestDetails.id}")
+            } Then {
+                status(HttpStatus.NO_CONTENT)
+
+                domainRequestDetailsRepository.findById(initialDomainRequestDetails.id).awaitSingle().run {
+                    assertFieldsToBeEqual(
+                        domainName to updateRequest.domainName,
+                        requestHeaders to updateRequest.requestHeaders,
+                        requestTimeoutInMillis to updateRequest.requestTimeoutInMillis
+                    )
                 }
             }
         }
@@ -91,18 +120,19 @@ internal class DomainRequestDetailsControllerTest(
     inner class NegativeOutcome {
 
         @Test
-        fun `should return NOT FOUND error response when queried for non-existing domain request details domain name`() {
-            Given {
-                queryParam("domainName", randomAlphanumeric(20))
-            } When {
-                get()
-            } Then {
-                status(HttpStatus.NOT_FOUND)
-                extractingBody<ErrorResponse> {
-                    assertThat(it.errorType).isEqualTo(ErrorType.NOT_FOUND)
+        fun `should return NOT FOUND error response when queried for non-existing domain request details domain name`() =
+            runTest {
+                Given {
+                    queryParam("domainName", randomAlphanumeric(20))
+                } When {
+                    get()
+                } Then {
+                    status(HttpStatus.NOT_FOUND)
+                    extractingBody<ErrorResponse> {
+                        assertThat(it.errorType).isEqualTo(ErrorType.NOT_FOUND)
+                    }
                 }
             }
-        }
 
         @Test
         fun `should return CONFLICT error response when trying to add duplicate domain request details`() = runTest {
@@ -130,8 +160,7 @@ private val sampleDomainRequestDetailsRequest = DomainRequestDetailsRequest(
     requestTimeoutInMillis = 1500
 )
 
-private
-val sampleDomainRequestDetails = DomainRequestDetails(
+private val sampleDomainRequestDetails = DomainRequestDetails(
     domainName = "testDomain2.com",
     requestHeaders = mapOf(
         "firstHeader2" to "firstHeaderValue2",

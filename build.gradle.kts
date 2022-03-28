@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 val coroutinesVersion = "1.6.0"
 val restAssuredVersion = "4.5.1"
@@ -8,6 +9,8 @@ plugins {
     id("org.springframework.boot") version "2.6.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.openapi.generator") version "5.3.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.spring") version "1.6.10"
 }
@@ -36,7 +39,10 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:2.1.21")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude("org.junit.vintage", "junit-vintage-engine")
+        exclude("org.mockito", "mockito-core")
+    }
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
@@ -87,4 +93,10 @@ openApiGenerate {
             "reactive" to "true",
         )
     )
+}
+
+configure<KtlintExtension> {
+    filter {
+        exclude("**/generated/**")
+    }
 }

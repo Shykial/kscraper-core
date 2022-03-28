@@ -27,6 +27,8 @@ import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
@@ -78,7 +80,7 @@ internal class ExtractingDetailsControllerTest(
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
                     assertThat(response.domainId).isEqualTo(request.domainId)
-                    val entities = extractingDetailsRepository.findByDomainId(request.domainId).collectList().block()!!
+                    val entities = extractingDetailsRepository.findByDomainId(request.domainId).asFlow().toList()
                     assertThat(response.extractedFieldsDetails).hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
                 }
             }
@@ -152,7 +154,7 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
-                extractingDetailsRepository.findById(initialExtractingDetails.id).block()!!.run {
+                extractingDetailsRepository.findById(initialExtractingDetails.id).awaitSingle().run {
                     assertFieldsToBeEqual(
                         fieldName to updateRequest.fieldName,
                         selector.index to updateRequest.selector.index,

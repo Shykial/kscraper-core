@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class DomainRequestDetails(
     @Indexed(unique = true)
-    val domainName: String,
-    val requestHeaders: Map<String, String>? = null,
-    val requestTimeoutInMillis: Int? = null,
+    var domainName: String,
+    var requestHeaders: Map<String, String>? = null,
+    var requestTimeoutInMillis: Int? = null,
 ) : BaseDocument()

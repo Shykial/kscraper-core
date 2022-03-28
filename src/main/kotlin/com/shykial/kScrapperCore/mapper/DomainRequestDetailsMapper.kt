@@ -16,3 +16,9 @@ fun DomainRequestDetails.toResponse() = DomainRequestDetailsResponse(
     requestHeaders = requestHeaders,
     requestTimeoutInMillis = requestTimeoutInMillis
 )
+
+fun DomainRequestDetails.updateWith(request: DomainRequestDetailsRequest) = apply {
+    domainName = request.domainName
+    requestHeaders = request.requestHeaders
+    requestTimeoutInMillis = request.requestTimeoutInMillis
+}

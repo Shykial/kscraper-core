@@ -35,4 +35,13 @@ class DomainRequestDetailsController(
         .runSuspend(domainRequestDetailsService::addDomainRequestDetails)
         .toResponse()
         .toResponseEntity(HttpStatus.CREATED)
+
+    override suspend fun updateDomainRequestDetails(
+        id: String,
+        domainRequestDetailsRequest: DomainRequestDetailsRequest
+    ): ResponseEntity<Unit> {
+        log.info("Received update domain request details request for domainRequestDetails ID: $id")
+        domainRequestDetailsService.updateDomainRequestDetails(id, domainRequestDetailsRequest)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
 }

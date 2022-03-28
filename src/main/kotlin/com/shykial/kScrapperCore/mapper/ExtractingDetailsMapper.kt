@@ -75,7 +75,6 @@ private fun ExtractedProperty.toResponsePair() =
         is Text -> ExtractedPropertyType.TEXT to null
     }
 
-
 private fun SelectorInApi.toEntityModel() = Selector(
     value = value,
     index = index

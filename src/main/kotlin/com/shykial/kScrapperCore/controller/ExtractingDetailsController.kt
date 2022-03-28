@@ -31,15 +31,6 @@ class ExtractingDetailsController(
             .toResponseEntity()
     }
 
-    override suspend fun updateExtractingDetails(
-        id: String,
-        extractingDetailsUpdateRequest: ExtractingDetailsUpdateRequest,
-    ): ResponseEntity<Unit> {
-        log.info("Received update extracting details request for extractingDetails ID: $id")
-        extractingDetailsService.updateExtractingDetails(id, extractingDetailsUpdateRequest)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
-    }
-
     override fun findExtractingDetails(
         domainId: String,
         fieldNames: List<String>?,
@@ -56,9 +47,18 @@ class ExtractingDetailsController(
         .also {
             log.info(
                 "Received request for adding extracting details for domainId: ${it.domainId}" +
-                        ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
+                    ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
             )
         }.runSuspend(extractingDetailsService::addExtractingDetails)
         .toResponse()
         .toResponseEntity(HttpStatus.CREATED)
+
+    override suspend fun updateExtractingDetails(
+        id: String,
+        extractingDetailsUpdateRequest: ExtractingDetailsUpdateRequest,
+    ): ResponseEntity<Unit> {
+        log.info("Received update extracting details request for extractingDetails ID: $id")
+        extractingDetailsService.updateExtractingDetails(id, extractingDetailsUpdateRequest)
+        return ResponseEntity(HttpStatus.NO_CONTENT)
+    }
 }

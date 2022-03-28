@@ -2,6 +2,7 @@ package com.shykial.kScrapperCore.service
 
 import com.shykial.kScrapperCore.exception.NotFoundException
 import com.shykial.kScrapperCore.mapper.toEntity
+import com.shykial.kScrapperCore.mapper.updateWith
 import com.shykial.kScrapperCore.model.entity.DomainRequestDetails
 import com.shykial.kScrapperCore.repository.DomainRequestDetailsRepository
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
@@ -30,4 +31,11 @@ class DomainRequestDetailsService(
         .toEntity()
         .also { log.info("Saving domainRequestDetails for domain ${it.domainName}") }
         .run(domainRequestDetailsRepository::save).awaitSingle()
+
+    suspend fun updateDomainRequestDetails(id: String, domainRequestDetailsRequest: DomainRequestDetailsRequest) {
+        domainRequestDetailsRepository.findById(id).awaitSingleOrNull()
+            ?.updateWith(domainRequestDetailsRequest)
+            ?.run(domainRequestDetailsRepository::save)?.awaitSingle()
+            ?: throw NotFoundException("Domain request details not found for ID $id")
+    }
 }

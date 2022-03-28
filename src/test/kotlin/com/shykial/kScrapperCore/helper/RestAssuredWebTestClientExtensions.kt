@@ -34,14 +34,14 @@ fun <T> ValidatableWebTestClientResponse.Extract(
 inline fun <reified T> ValidatableWebTestClientResponse.extractingBody(block: (T) -> Unit) =
     extract().`as`(object : TypeRef<T>() {}).run(block)
 
-infix fun WebTestClientResponse.Then(block: ValidatableWebTestClientResponse.() -> Unit) = then()
+suspend infix fun WebTestClientResponse.Then(block: suspend ValidatableWebTestClientResponse.() -> Unit) = then()
     .also(
         doIfValidatableResponseImpl {
             forceDisableEagerAssert()
         }
     )
     .also { it.log().all() }
-    .apply(block)
+    .apply { block() }
     .also(
         doIfValidatableResponseImpl {
             forceValidateResponse()
