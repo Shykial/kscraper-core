@@ -71,6 +71,7 @@ internal class ExtractingDetailsControllerTest(
         fun `should properly add extracting details on POST request`() = runTest {
             val request = sampleExtractingDetailsRequest
             extractingDetailsRepository.findByDomainId(request.domainId).awaitAndAssertEmpty()
+
             Given {
                 contentType(ContentType.JSON)
                 body(sampleExtractingDetailsRequest.toJsonString())
@@ -89,8 +90,9 @@ internal class ExtractingDetailsControllerTest(
         @Test
         fun `should properly retrieve extracting details by domainId on GET request`() = runTest {
             val entities = sampleExtractingDetailsRequest.toEntities()
+                .run(extractingDetailsRepository::saveAll).collectList().awaitSingle()
             val domainId = sampleExtractingDetailsRequest.domainId
-            extractingDetailsRepository.saveAll(entities).collectList().awaitSingle()
+
             Given {
                 queryParam("domainId", domainId)
             } When {
@@ -99,6 +101,21 @@ internal class ExtractingDetailsControllerTest(
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
                     assertThat(response).hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
+                }
+            }
+        }
+
+        @Test
+        fun `should properly retrieve extracting details by ID on GET request`() = runTest {
+            val entity = sampleExtractingDetailsRequest.toEntities().random()
+                .run(extractingDetailsRepository::save).awaitSingle()
+
+            When {
+                get("/${entity.id}")
+            } Then {
+                status(HttpStatus.OK)
+                extractingBody<ExtractingDetailsResponse> {
+                    assertThat(it).isEqualTo(entity.toExtractingDetailsResponse())
                 }
             }
         }

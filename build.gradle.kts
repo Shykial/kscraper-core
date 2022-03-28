@@ -1,5 +1,5 @@
+import kotlinx.kover.api.CoverageEngine
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 val coroutinesVersion = "1.6.0"
 val restAssuredVersion = "4.5.1"
@@ -95,8 +95,20 @@ openApiGenerate {
     )
 }
 
-configure<KtlintExtension> {
+ktlint {
     filter {
         exclude("**/generated/**")
+    }
+}
+
+kover {
+    coverageEngine.set(CoverageEngine.INTELLIJ)
+}
+
+tasks.koverVerify {
+    rule {
+        bound {
+            minValue = 80
+        }
     }
 }

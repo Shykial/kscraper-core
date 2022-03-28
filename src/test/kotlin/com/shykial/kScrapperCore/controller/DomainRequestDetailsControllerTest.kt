@@ -53,13 +53,26 @@ internal class DomainRequestDetailsControllerTest(
 
         @Test
         fun `should properly retrieve domain request details by domain name on GET request`() = runTest {
-            val entity = sampleDomainRequestDetails
-            domainRequestDetailsRepository.save(entity).awaitSingle()
+            val entity = sampleDomainRequestDetails.run(domainRequestDetailsRepository::save).awaitSingle()
 
             Given {
                 queryParam("domainName", entity.domainName)
             } When {
                 get()
+            } Then {
+                status(HttpStatus.OK)
+                extractingBody<DomainRequestDetailsResponse> {
+                    assertThat(it).isEqualTo(entity.toResponse())
+                }
+            }
+        }
+
+        @Test
+        fun `should properly retrieve domain reqeust details by ID on GET request`() = runTest {
+            val entity = sampleDomainRequestDetails.run(domainRequestDetailsRepository::save).awaitSingle()
+
+            When {
+                get("/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
