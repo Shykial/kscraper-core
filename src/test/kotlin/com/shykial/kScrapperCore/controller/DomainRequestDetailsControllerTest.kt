@@ -68,7 +68,7 @@ internal class DomainRequestDetailsControllerTest(
         }
 
         @Test
-        fun `should properly retrieve domain reqeust details by ID on GET request`() = runTest {
+        fun `should properly retrieve domain request details by ID on GET request`() = runTest {
             val entity = sampleDomainRequestDetails.run(domainRequestDetailsRepository::save).awaitSingle()
 
             When {
