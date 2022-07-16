@@ -1,23 +1,23 @@
 import kotlinx.kover.api.CoverageEngine
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val coroutinesVersion = "1.6.0"
-val restAssuredVersion = "4.5.1"
-val testContainersVersion = "1.16.3"
+val restAssuredVersion = "5.1.1"
+val testContainersVersion = "1.17.3"
 
 plugins {
-    id("org.springframework.boot") version "2.6.4"
+    id("org.springframework.boot") version "2.7.1"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.openapi.generator") version "5.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    id("org.jetbrains.kotlinx.kover") version "0.5.0"
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.spring") version "1.6.10"
+    id("org.jetbrains.kotlinx.kover") version "0.5.1"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.spring") version "1.7.10"
 }
 
 group = "com.shykial"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -33,25 +33,22 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("it.skrape:skrapeit:1.2.1")
-    implementation("io.github.microutils:kotlin-logging:2.1.21")
+    implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude("org.junit.vintage", "junit-vintage-engine")
         exclude("org.mockito", "mockito-core")
+        exclude("org.mockito", "mockito-junit-jupiter")
     }
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("org.testcontainers:mongodb:$testContainersVersion")
-    testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
-    testImplementation("io.rest-assured:xml-path:$restAssuredVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mongodb")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
-    testImplementation("io.rest-assured:kotlin-extensions:$restAssuredVersion")
 }
 
 dependencyManagement {
@@ -63,12 +60,15 @@ dependencyManagement {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict", "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    testLogging {
+        events = setOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
+    }
 }
 
 tasks.compileKotlin {
@@ -111,4 +111,5 @@ tasks.koverVerify {
             minValue = 80
         }
     }
+    excludes = listOf("generated.*")
 }

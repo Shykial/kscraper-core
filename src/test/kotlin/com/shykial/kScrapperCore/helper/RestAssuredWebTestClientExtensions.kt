@@ -12,22 +12,22 @@ import io.restassured.module.webtestclient.specification.WebTestClientRequestSen
 import io.restassured.module.webtestclient.specification.WebTestClientRequestSpecification
 import io.restassured.response.ExtractableResponse
 
-fun Given(
+inline fun Given(
     block: WebTestClientRequestSpecification.() -> WebTestClientRequestSpecification
 ): WebTestClientRequestSpecification = RestAssuredWebTestClient.given().run(block)
 
-infix fun WebTestClientRequestSpecification.When(
+inline infix fun WebTestClientRequestSpecification.When(
     block: WebTestClientRequestSender.() -> WebTestClientResponse
 ): WebTestClientResponse = `when`().run(block)
 
-fun When(
+inline fun When(
     block: WebTestClientRequestSender.() -> WebTestClientResponse
 ): WebTestClientResponse = RestAssuredWebTestClient.given().`when`().run(block)
 
-infix fun <T> WebTestClientResponse.Extract(block: ExtractableResponse<WebTestClientResponse>.() -> T): T =
+inline infix fun <T> WebTestClientResponse.Extract(block: ExtractableResponse<WebTestClientResponse>.() -> T): T =
     then().extract().run(block)
 
-fun <T> ValidatableWebTestClientResponse.Extract(
+inline fun <T> ValidatableWebTestClientResponse.Extract(
     block: ExtractableResponse<WebTestClientResponse>.() -> T
 ): T = extract().run(block)
 
@@ -48,8 +48,8 @@ suspend infix fun WebTestClientResponse.Then(block: suspend ValidatableWebTestCl
         }
     )
 
-private fun doIfValidatableResponseImpl(
-    fn: ResponseSpecificationImpl.() -> Unit
+private inline fun doIfValidatableResponseImpl(
+    crossinline fn: ResponseSpecificationImpl.() -> Unit
 ): (ValidatableWebTestClientResponse) -> Unit = { resp ->
     if (resp is ValidatableWebTestClientResponseImpl) {
         fn(resp.responseSpec)
