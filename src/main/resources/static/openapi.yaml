@@ -6,11 +6,34 @@ info:
 servers:
   - url: 'http://localhost:8080'
 tags:
+  - name: Auth
+    description: Operations related to authorization and authentication
   - name: Extracting Details
     description: Operations related to extracting details
   - name: Domain Request Details
     description: Operations related to domain request details
 paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        401:
+          description: Unauthorized
+
   /extracting-details/{id}:
     get:
       tags:
@@ -179,6 +202,25 @@ paths:
 
 components:
   schemas:
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
+
     ExtractingDetailsRequest:
       type: object
       properties:
