@@ -13,7 +13,9 @@ data class ApplicationUser(
     @Indexed(unique = true)
     var email: String,
 
-    val role: UserRole
+    val role: UserRole,
+
+    var isDisabled: Boolean = false
 ) : BaseDocument()
 
 enum class UserRole {

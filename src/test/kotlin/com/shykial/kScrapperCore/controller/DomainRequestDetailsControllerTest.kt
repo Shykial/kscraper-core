@@ -16,7 +16,7 @@ import com.shykial.kScrapperCore.starter.MongoDBStarter
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
-import generated.com.shykial.kScrapperCore.models.ErrorResponse.ErrorType
+import generated.com.shykial.kScrapperCore.models.ErrorType
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.runBlocking

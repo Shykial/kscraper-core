@@ -30,7 +30,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.auth0:java-jwt:3.19.1")
+    implementation("com.auth0:java-jwt:3.19.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -42,8 +42,8 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude("org.junit.vintage", "junit-vintage-engine")
-        exclude("org.mockito", "mockito-core")
-        exclude("org.mockito", "mockito-junit-jupiter")
+        exclude(module = "mockito-core")
+        exclude(module = "mockito-junit-jupiter")
     }
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
@@ -51,6 +51,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
+    testImplementation("com.ninja-squad:springmockk:3.1.1")
 }
 
 dependencyManagement {

@@ -340,17 +340,22 @@ components:
       type: object
       properties:
         errorType:
-          type: string
-          enum:
-            - INVALID_INPUT
-            - INTERNAL_SEVER_ERROR
-            - NOT_FOUND
-            - DUPLICATE_DATA
+          $ref: '#/components/schemas/ErrorType'
         errorMessage:
           type: string
       required:
         - errorType
         - errorMessage
+    ErrorType:
+      type: string
+      enum:
+        - INVALID_INPUT
+        - INTERNAL_SEVER_ERROR
+        - NOT_FOUND
+        - DUPLICATE_DATA
+        - AUTHENTICATION_FAILURE
+        - AUTHORIZATION_FAILURE
+
   parameters:
     Id:
       name: id
