@@ -6,8 +6,8 @@ import com.shykial.kScrapperCore.helper.RestTest
 import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
 import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
-import com.shykial.kScrapperCore.helper.awaitAndAssertNull
 import com.shykial.kScrapperCore.helper.extractingBody
+import com.shykial.kScrapperCore.helper.saveIn
 import com.shykial.kScrapperCore.mapper.toEntity
 import com.shykial.kScrapperCore.mapper.toResponse
 import com.shykial.kScrapperCore.model.entity.DomainRequestDetails
@@ -19,7 +19,7 @@ import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse.ErrorType
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
-import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.assertj.core.api.Assertions.assertThat
@@ -45,7 +45,7 @@ internal class DomainRequestDetailsControllerTest(
 
     @BeforeEach
     fun setup() {
-        domainRequestDetailsRepository.deleteAll().block()
+        runBlocking { domainRequestDetailsRepository.deleteAll() }
     }
 
     @Nested
@@ -53,7 +53,7 @@ internal class DomainRequestDetailsControllerTest(
 
         @Test
         fun `should properly retrieve domain request details by domain name on GET request`() = runTest {
-            val entity = sampleDomainRequestDetails.run(domainRequestDetailsRepository::save).awaitSingle()
+            val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
 
             Given {
                 queryParam("domainName", entity.domainName)
@@ -69,7 +69,7 @@ internal class DomainRequestDetailsControllerTest(
 
         @Test
         fun `should properly retrieve domain request details by ID on GET request`() = runTest {
-            val entity = sampleDomainRequestDetails.run(domainRequestDetailsRepository::save).awaitSingle()
+            val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
 
             When {
                 get("/${entity.id}")
@@ -84,7 +84,9 @@ internal class DomainRequestDetailsControllerTest(
         @Test
         fun `should add new domain request detail on POST request`() = runTest {
             val request = sampleDomainRequestDetailsRequest
-            domainRequestDetailsRepository.findByDomainName(request.domainName).awaitAndAssertNull()
+            domainRequestDetailsRepository.findByDomainName(request.domainName).run {
+                assertThat(this).isNull()
+            }
 
             Given {
                 contentType(ContentType.JSON)
@@ -94,8 +96,8 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<DomainRequestDetailsResponse> {
-                    val entity = domainRequestDetailsRepository.findByDomainName(request.domainName).awaitSingle()
-                    assertThat(it).isEqualTo(entity.toResponse())
+                    val entity = domainRequestDetailsRepository.findByDomainName(request.domainName)
+                    assertThat(it).isEqualTo(entity?.toResponse())
                 }
             }
         }
@@ -103,7 +105,7 @@ internal class DomainRequestDetailsControllerTest(
         @Test
         fun `should properly update domain request details on PUT request`() = runTest {
             val initialDomainRequestDetails = sampleDomainRequestDetails
-                .run(domainRequestDetailsRepository::save).awaitSingle()
+                .saveIn(domainRequestDetailsRepository)
             val updateRequest = DomainRequestDetailsRequest(
                 domainName = initialDomainRequestDetails.domainName,
                 requestHeaders = initialDomainRequestDetails.requestHeaders?.plus("newHeader" to "newValue"),
@@ -118,7 +120,7 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
-                domainRequestDetailsRepository.findById(initialDomainRequestDetails.id).awaitSingle().run {
+                domainRequestDetailsRepository.findById(initialDomainRequestDetails.id)!!.run {
                     assertFieldsToBeEqual(
                         domainName to updateRequest.domainName,
                         requestHeaders to updateRequest.requestHeaders,
@@ -150,7 +152,7 @@ internal class DomainRequestDetailsControllerTest(
         @Test
         fun `should return CONFLICT error response when trying to add duplicate domain request details`() = runTest {
             val request = sampleDomainRequestDetailsRequest
-            domainRequestDetailsRepository.save(request.toEntity()).awaitSingle()
+            domainRequestDetailsRepository.save(request.toEntity())
 
             Given {
                 contentType(ContentType.JSON)

@@ -1,6 +1,7 @@
 package com.shykial.kScrapperCore.controller
 
 import com.shykial.kScrapperCore.extension.runSuspend
+import com.shykial.kScrapperCore.helper.iterableFlow
 import com.shykial.kScrapperCore.helper.toResponseEntity
 import com.shykial.kScrapperCore.mapper.toExtractingDetailsResponse
 import com.shykial.kScrapperCore.mapper.toResponse
@@ -12,7 +13,6 @@ import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -33,13 +33,12 @@ class ExtractingDetailsController(
 
     override fun findExtractingDetails(
         domainId: String,
-        fieldNames: List<String>?,
-    ): ResponseEntity<Flow<ExtractingDetailsResponse>> {
+        fieldNames: List<String>?
+    ): ResponseEntity<Flow<ExtractingDetailsResponse>> = iterableFlow {
         log.info("Received find extracting details request for domainId: $domainId and fieldNames: $fieldNames")
-        return extractingDetailsService.findByDomainIdAndFieldNames(domainId, fieldNames)
+        extractingDetailsService.findByDomainIdAndFieldNames(domainId, fieldNames)
             .map { it.toExtractingDetailsResponse() }
-            .toResponseEntity()
-    }
+    }.toResponseEntity()
 
     override suspend fun addExtractingDetails(
         extractingDetailsRequest: ExtractingDetailsRequest,
@@ -47,7 +46,7 @@ class ExtractingDetailsController(
         .also {
             log.info(
                 "Received request for adding extracting details for domainId: ${it.domainId}" +
-                    ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
+                        ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
             )
         }.runSuspend(extractingDetailsService::addExtractingDetails)
         .toResponse()

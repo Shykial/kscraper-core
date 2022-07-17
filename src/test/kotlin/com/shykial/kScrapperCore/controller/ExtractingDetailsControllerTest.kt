@@ -6,9 +6,10 @@ import com.shykial.kScrapperCore.helper.RestTest
 import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
 import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
-import com.shykial.kScrapperCore.helper.awaitAndAssertEmpty
 import com.shykial.kScrapperCore.helper.decodeBase64
 import com.shykial.kScrapperCore.helper.extractingBody
+import com.shykial.kScrapperCore.helper.saveAllIn
+import com.shykial.kScrapperCore.helper.saveIn
 import com.shykial.kScrapperCore.helper.toBase64String
 import com.shykial.kScrapperCore.mapper.toEntities
 import com.shykial.kScrapperCore.mapper.toExtractingDetailsResponse
@@ -27,9 +28,7 @@ import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
 import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
@@ -37,8 +36,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -48,7 +45,6 @@ import generated.com.shykial.kScrapperCore.models.RegexReplacement as RegexRepla
 import generated.com.shykial.kScrapperCore.models.Selector as SelectorInApi
 
 @SpringBootTest
-@TestInstance(Lifecycle.PER_CLASS)
 internal class ExtractingDetailsControllerTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
@@ -61,7 +57,7 @@ internal class ExtractingDetailsControllerTest(
 
     @BeforeEach
     fun setup() {
-        extractingDetailsRepository.deleteAll().block()
+        runBlocking { extractingDetailsRepository.deleteAll() }
     }
 
     @Nested
@@ -70,7 +66,9 @@ internal class ExtractingDetailsControllerTest(
         @Test
         fun `should properly add extracting details on POST request`() = runTest {
             val request = sampleExtractingDetailsRequest
-            extractingDetailsRepository.findByDomainId(request.domainId).awaitAndAssertEmpty()
+            extractingDetailsRepository.findByDomainId(request.domainId).let {
+                assertThat(it).isEmpty()
+            }
 
             Given {
                 contentType(ContentType.JSON)
@@ -81,7 +79,7 @@ internal class ExtractingDetailsControllerTest(
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
                     assertThat(response.domainId).isEqualTo(request.domainId)
-                    val entities = extractingDetailsRepository.findByDomainId(request.domainId).asFlow().toList()
+                    val entities = extractingDetailsRepository.findByDomainId(request.domainId)
                     assertThat(response.extractedFieldsDetails).hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
                 }
             }
@@ -89,8 +87,9 @@ internal class ExtractingDetailsControllerTest(
 
         @Test
         fun `should properly retrieve extracting details by domainId on GET request`() = runTest {
-            val entities = sampleExtractingDetailsRequest.toEntities()
-                .run(extractingDetailsRepository::saveAll).collectList().awaitSingle()
+            val entities = sampleExtractingDetailsRequest
+                .toEntities()
+                .saveAllIn(extractingDetailsRepository)
             val domainId = sampleExtractingDetailsRequest.domainId
 
             Given {
@@ -108,7 +107,7 @@ internal class ExtractingDetailsControllerTest(
         @Test
         fun `should properly retrieve extracting details by ID on GET request`() = runTest {
             val entity = sampleExtractingDetailsRequest.toEntities().random()
-                .run(extractingDetailsRepository::save).awaitSingle()
+                .saveIn(extractingDetailsRepository)
 
             When {
                 get("/${entity.id}")
@@ -123,8 +122,8 @@ internal class ExtractingDetailsControllerTest(
         @Test
         fun `should properly retrieve extracting details by domainId and fieldNames on GET request`() = runTest {
             val allEntities = sampleExtractingDetailsRequest.toEntities()
+                .saveAllIn(extractingDetailsRepository)
             val domainId = sampleExtractingDetailsRequest.domainId
-            extractingDetailsRepository.saveAll(allEntities).collectList().awaitSingle()
             val randomEntities = allEntities.shuffled().take(3)
 
             Given {
@@ -151,7 +150,7 @@ internal class ExtractingDetailsControllerTest(
                 regexReplacements = mutableListOf(
                     RegexReplacement(initialRegexString.toRegex(), "replacement")
                 )
-            ).also { extractingDetailsRepository.save(it).awaitSingle() }
+            ).saveIn(extractingDetailsRepository)
             val updateRequest = ExtractingDetailsUpdateRequest(
                 fieldName = initialExtractingDetails.fieldName,
                 selector = with(initialExtractingDetails.selector) { SelectorInApi(value = value, index = index + 1) },
@@ -171,7 +170,7 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
-                extractingDetailsRepository.findById(initialExtractingDetails.id).awaitSingle().run {
+                extractingDetailsRepository.findById(initialExtractingDetails.id)!!.run {
                     assertFieldsToBeEqual(
                         fieldName to updateRequest.fieldName,
                         selector.index to updateRequest.selector.index,

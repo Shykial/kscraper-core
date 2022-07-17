@@ -17,9 +17,11 @@ class SecurityConfig {
 
     @Bean
     fun securityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = http {
+        csrf { disable() }
         authorizeExchange {
             authorize(AUTH_PATHS, permitAll)
-            authorize(anyExchange, authenticated)
+//            authorize(anyExchange, authenticated)
+            authorize(anyExchange, permitAll)
         }
     }
 

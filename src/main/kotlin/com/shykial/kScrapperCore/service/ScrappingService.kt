@@ -1,5 +1,6 @@
 package com.shykial.kScrapperCore.service
 
+import com.shykial.kScrapperCore.exception.NotFoundException
 import com.shykial.kScrapperCore.model.entity.Attribute
 import com.shykial.kScrapperCore.model.entity.ExtractingDetails
 import com.shykial.kScrapperCore.model.entity.OwnText
@@ -12,9 +13,6 @@ import it.skrape.fetcher.response
 import it.skrape.fetcher.skrape
 import it.skrape.selects.Doc
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactor.awaitSingle
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -30,12 +28,11 @@ class ScrappingService(
 
     suspend fun scrapeUrl(productUrl: String, scrapedFields: List<String>? = null) = coroutineScope {
         log.info("Scraping url $productUrl for fields $scrapedFields")
-        val domainDetails = DomainRequestDetailsRepository.findByDomainName(productUrl.domainPart()).awaitSingle()
-        val extractingDetails = (
-            scrapedFields?.let {
-                extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)
-            } ?: extractingDetailsRepository.findByDomainId(domainDetails.id)
-            ).asFlow().toList()
+        val domainDetails = DomainRequestDetailsRepository.findByDomainName(productUrl.domainPart())
+            ?: throw NotFoundException("Domain request details for domain name ${productUrl.domainPart()} not found")
+        val extractingDetails = scrapedFields?.let {
+            extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)
+        } ?: extractingDetailsRepository.findByDomainId(domainDetails.id)
         skrape(AsyncFetcher) {
             request {
                 url = productUrl

@@ -15,8 +15,6 @@ import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import generated.com.shykial.kScrapperCore.models.RegexReplacement as RegexReplacementInApi
 import generated.com.shykial.kScrapperCore.models.Selector as SelectorInApi
 
@@ -42,8 +40,7 @@ fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
     )
 }
 
-suspend fun Flow<ExtractingDetails>.toResponse() = toList()
-    .groupBy(ExtractingDetails::domainId)
+fun List<ExtractingDetails>.toResponse() = groupBy(ExtractingDetails::domainId)
     .entries.single().let { (domainId, extractingDetails) ->
         AddExtractingDetailsResponse(
             domainId = domainId,

@@ -6,6 +6,14 @@ spring:
     mongodb:
       authentication-database: admin
       auto-index-creation: true
+
+security:
+  jwt:
+    secret: temp
+    validity-in-minutes: 15
+    issuer: k-scrapper-core
+    roles-claim-name: roles
+
 logging:
   level:
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
