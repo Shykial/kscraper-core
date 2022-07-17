@@ -9,7 +9,7 @@ private const val mongoProperties = "spring.data.mongodb"
 
 interface MongoDBStarter {
     companion object {
-        private val mongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:5.0.6"))
+        private val mongoDBContainer = MongoDBContainer(DockerImageName.parse("mongo:5.0.9"))
             .apply { start() }
 
         @JvmStatic

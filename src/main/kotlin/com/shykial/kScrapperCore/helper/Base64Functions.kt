@@ -1,7 +1,7 @@
 package com.shykial.kScrapperCore.helper
 
-import org.bson.internal.Base64
+import org.springframework.util.Base64Utils
 
-internal fun String.toBase64String() = Base64.encode(toByteArray())
+fun String.toBase64String() = Base64Utils.encodeToString(toByteArray())
 
-internal fun decodeBase64(string: String) = Base64.decode(string).decodeToString()
+fun decodeBase64(encodedString: String) = Base64Utils.decodeFromString(encodedString).decodeToString()
