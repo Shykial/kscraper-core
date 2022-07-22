@@ -12,7 +12,6 @@ class JwtProperties(
     val rolesClaimName: String
 ) {
     companion object {
-        const val AUTH_HEADER_NAME = "Authorization"
-        const val AUTH_HEADER_PREFIX = "Bearer"
+        const val AUTH_HEADER_PREFIX = "Bearer "
     }
 }

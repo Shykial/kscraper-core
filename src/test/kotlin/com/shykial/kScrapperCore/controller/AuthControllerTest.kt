@@ -17,9 +17,11 @@ import com.shykial.kScrapperCore.starter.MongoDBStarter
 import generated.com.shykial.kScrapperCore.models.AuthToken
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorType
+import generated.com.shykial.kScrapperCore.models.IdResponse
 import generated.com.shykial.kScrapperCore.models.LoginRequest
-import io.restassured.http.ContentType
+import generated.com.shykial.kScrapperCore.models.RegisterUserRequest
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -62,8 +64,7 @@ internal class AuthControllerTest(
             val validUser = sampleValidUser(rawPassword).saveIn(applicationUserRepository)
             val loginRequest = LoginRequest(login = validUser.login, password = rawPassword)
             Given {
-                contentType(ContentType.JSON)
-                body(loginRequest.toJsonString())
+                jsonBody(loginRequest)
             } When {
                 post("/login")
             } Then {
@@ -75,18 +76,48 @@ internal class AuthControllerTest(
                 }
             }
         }
+
+        @Test
+        fun `should properly register new user on POST request and return its id`() = runTest {
+            val request = RegisterUserRequest(
+                login = "properLogin",
+                email = "proper@email.com",
+                password = "properPassword4812$"
+            )
+            applicationUserRepository.findAll().toList().let {
+                assertThat(it).isEmpty()
+            }
+
+            Given {
+                jsonBody(request)
+            } When {
+                post("/register")
+            } Then {
+                status(HttpStatus.CREATED)
+                extractingBody<IdResponse> { response ->
+                    applicationUserRepository.findById(response.id)!!.assertProperUserPersisted(request)
+                }
+            }
+        }
+    }
+
+    private fun ApplicationUser.assertProperUserPersisted(
+        request: RegisterUserRequest
+    ) {
+        assertThat(login).isEqualTo(request.login)
+        assertThat(email).isEqualTo(request.email)
+        assertThat(passwordEncoder.matches(request.password, passwordHash)).isTrue
     }
 
     @Nested
     inner class NegativeOutcome {
         @Test
-        fun `should throw exception when providing invalid credentials`() = runTest {
+        fun `should return UNAUTHORIZED when logging in providing invalid credentials`() = runTest {
             val rawPassword = "testPassword2"
             val validUser = sampleValidUser(rawPassword).saveIn(applicationUserRepository)
             val invalidLoginRequest = LoginRequest(login = validUser.login, password = "invalidPassword")
             Given {
-                contentType(ContentType.JSON)
-                body(invalidLoginRequest.toJsonString())
+                jsonBody(invalidLoginRequest)
             } When {
                 post("/login")
             } Then {
@@ -94,6 +125,47 @@ internal class AuthControllerTest(
                 extractingBody<ErrorResponse> {
                     assertThat(it.errorType).isEqualTo(ErrorType.AUTHENTICATION_FAILURE)
                 }
+            }
+        }
+
+        @Test
+        fun `should return BAD REQUEST when registering with invalid data`() = runTest {
+            val invalidRequest = RegisterUserRequest(
+                login = "validLogin",
+                email = "invalidEmail",
+                password = "validPassword123*"
+            )
+
+            Given {
+                jsonBody(invalidRequest)
+            } When {
+                post("/register")
+            } Then {
+                status(HttpStatus.BAD_REQUEST)
+                applicationUserRepository.findAll().toList().run { assertThat(this).isEmpty() }
+            }
+        }
+
+        @Test
+        fun `should fail registering new user with non-unique login`() = runTest {
+            val existingUser = ApplicationUser(
+                login = "existingLogin",
+                passwordHash = "passwordHash",
+                email = "email@email.com"
+            ).saveIn(applicationUserRepository)
+            val request = RegisterUserRequest(
+                login = existingUser.login,
+                email = "sampleEmail@email.com",
+                password = "samplePassword123*"
+            )
+
+            Given {
+                jsonBody(request)
+            } When {
+                post("/register")
+            } Then {
+                status(HttpStatus.CONFLICT)
+                assertThat(applicationUserRepository.findByLogin(existingUser.login)).isEqualTo(existingUser)
             }
         }
     }
@@ -108,8 +180,7 @@ internal class AuthControllerTest(
 
     private fun DecodedJWT.assertProperTokenGenerated(validUser: ApplicationUser) {
         assertThat(subject).isEqualTo(validUser.login)
-        assertThat(claims[jwtProperties.rolesClaimName]?.asList(String::class.java))
-            .isEqualTo(listOf(validUser.role.name))
+        assertThat(claims[jwtProperties.rolesClaimName]?.asList(String::class.java)).isEqualTo(listOf(validUser.role.name))
         assertThat(issuer).isEqualTo(jwtProperties.issuer)
         assertThat(issuedAt.toInstant()).isCloseTo(Instant.now(), within(1, ChronoUnit.MINUTES))
         assertThat(expiresAt.toInstant()).isCloseTo(

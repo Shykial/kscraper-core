@@ -11,12 +11,11 @@ import com.shykial.kScrapperCore.model.entity.UserRole
 import com.shykial.kScrapperCore.security.JwtProperties
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 @Component
 class JwtProvider(
-    private val jwtProperties: JwtProperties,
+    private val jwtProperties: JwtProperties
 ) {
     private val algorithm = Algorithm.HMAC256(jwtProperties.secret)
     private val verifier = JWT.require(algorithm).build()
@@ -31,12 +30,16 @@ class JwtProvider(
                 .withIssuer(issuer)
         }
 
-    fun createToken(subject: String, roles: Collection<UserRole>, additionalClaims: Map<String, Any>? = null): String =
-        basicTokenBuilder
-            .withSubject(subject)
-            .withClaim(jwtProperties.rolesClaimName, roles.map(UserRole::name))
-            .withPayload(additionalClaims)
-            .sign(algorithm)
+    fun createToken(
+        subject: String,
+        roles: Collection<UserRole>,
+        additionalClaims: Map<String, Any>? = null
+    ): JwtToken = basicTokenBuilder
+        .withSubject(subject)
+        .withClaim(jwtProperties.rolesClaimName, roles.map(UserRole::name))
+        .withPayload(additionalClaims)
+        .sign(algorithm)
+        .run(::JwtToken)
 
     fun validateAndDecodeToken(token: String) = runCatching {
         verifier.verify(token)
@@ -45,8 +48,8 @@ class JwtProvider(
 }
 
 class DecodedToken(
-    private val decodedJWT: DecodedJWT,
-    rolesClaimName: String,
+    decodedJWT: DecodedJWT,
+    rolesClaimName: String
 ) {
     val subject: String? = decodedJWT.subject
     val roles: List<String>? = decodedJWT.getClaim(rolesClaimName).asList(String::class.java)
@@ -58,3 +61,6 @@ class DecodedToken(
         get() = expiresAt?.isBefore(Instant.now())
             ?: throw InvalidInputException("ExpiresAt claim not present in token") // todo replace this exception
 }
+
+@JvmInline
+value class JwtToken(val token: String)

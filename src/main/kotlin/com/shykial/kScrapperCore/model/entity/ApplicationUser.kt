@@ -13,9 +13,11 @@ data class ApplicationUser(
     @Indexed(unique = true)
     var email: String,
 
-    val role: UserRole,
+    val role: UserRole = UserRole.API_USER,
 
-    var isDisabled: Boolean = false
+    var isDisabled: Boolean = false,
+
+    var isEnabled: Boolean = false
 ) : BaseDocument()
 
 enum class UserRole {

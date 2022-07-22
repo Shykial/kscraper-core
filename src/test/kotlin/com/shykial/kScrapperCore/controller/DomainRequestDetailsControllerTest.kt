@@ -5,7 +5,6 @@ import com.shykial.kScrapperCore.helper.Given
 import com.shykial.kScrapperCore.helper.RestTest
 import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
-import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
 import com.shykial.kScrapperCore.helper.extractingBody
 import com.shykial.kScrapperCore.helper.saveIn
 import com.shykial.kScrapperCore.mapper.toEntity
@@ -17,7 +16,6 @@ import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorType
-import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -36,7 +34,7 @@ private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "/domain-request-details"
 internal class DomainRequestDetailsControllerTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
-    private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
+    private val domainRequestDetailsRepository: DomainRequestDetailsRepository
 ) : RestTest(), MongoDBStarter {
 
     init {
@@ -89,8 +87,7 @@ internal class DomainRequestDetailsControllerTest(
             }
 
             Given {
-                contentType(ContentType.JSON)
-                body(request.toJsonString())
+                jsonBody(request)
             } When {
                 post()
             } Then {
@@ -113,19 +110,16 @@ internal class DomainRequestDetailsControllerTest(
             )
 
             Given {
-                contentType(ContentType.JSON)
-                body(updateRequest.toJsonString())
+                jsonBody(updateRequest)
             } When {
                 put("/${initialDomainRequestDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
                 domainRequestDetailsRepository.findById(initialDomainRequestDetails.id)!!.run {
-                    assertFieldsToBeEqual(
-                        domainName to updateRequest.domainName,
-                        requestHeaders to updateRequest.requestHeaders,
-                        requestTimeoutInMillis to updateRequest.requestTimeoutInMillis
-                    )
+                    assertThat(domainName).isEqualTo(updateRequest.domainName)
+                    assertThat(requestHeaders).isEqualTo(updateRequest.requestHeaders)
+                    assertThat(requestTimeoutInMillis).isEqualTo(updateRequest.requestTimeoutInMillis)
                 }
             }
         }
@@ -155,8 +149,7 @@ internal class DomainRequestDetailsControllerTest(
             domainRequestDetailsRepository.save(request.toEntity())
 
             Given {
-                contentType(ContentType.JSON)
-                body(request.toJsonString())
+                jsonBody(request)
             } When {
                 post()
             } Then {

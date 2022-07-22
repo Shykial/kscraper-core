@@ -1,7 +1,9 @@
 package com.shykial.kScrapperCore.helper
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
+import io.restassured.module.webtestclient.specification.WebTestClientRequestSpecification
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.test.web.reactive.server.WebTestClient
 import javax.annotation.PostConstruct
@@ -16,5 +18,9 @@ abstract class RestTest {
         RestAssuredWebTestClient.webTestClient(webTestClient)
     }
 
-    fun Any?.toJsonString(): String = objectMapper.writeValueAsString(this)
+    fun WebTestClientRequestSpecification.jsonBody(body: Any?) =
+        contentType(ContentType.JSON)
+            .body(body.toJsonString())
+
+    private fun Any?.toJsonString(): String = objectMapper.writeValueAsString(this)
 }

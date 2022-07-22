@@ -9,10 +9,10 @@ import com.shykial.kScrapperCore.helper.toResponseEntity
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorType
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.RestControllerAdvice
 
-@RestControllerAdvice
+@ControllerAdvice
 class RestExceptionAdvisor {
 
     @ExceptionHandler

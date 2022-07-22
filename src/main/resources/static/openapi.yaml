@@ -31,8 +31,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthToken'
-        401:
-          description: Unauthorized
+        400:
+          description: Bad request
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserRequest'
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        400:
+          description: Bad request
 
   /extracting-details/{id}:
     get:
@@ -202,6 +223,13 @@ paths:
 
 components:
   schemas:
+    IdResponse:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
     LoginRequest:
       type: object
       properties:
@@ -211,6 +239,23 @@ components:
           type: string
       required:
         - login
+        - password
+
+    RegisterUserRequest:
+      type: object
+      properties:
+        login:
+          type: string
+          pattern: '^\w{3,}'
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$'
+      required:
+        - login
+        - email
         - password
 
     AuthToken:

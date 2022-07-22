@@ -5,12 +5,12 @@ import com.shykial.kScrapperCore.helper.Given
 import com.shykial.kScrapperCore.helper.RestTest
 import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
-import com.shykial.kScrapperCore.helper.assertFieldsToBeEqual
 import com.shykial.kScrapperCore.helper.decodeBase64
 import com.shykial.kScrapperCore.helper.extractingBody
 import com.shykial.kScrapperCore.helper.saveAllIn
 import com.shykial.kScrapperCore.helper.saveIn
 import com.shykial.kScrapperCore.helper.toBase64String
+import com.shykial.kScrapperCore.helper.usingTypeComparator
 import com.shykial.kScrapperCore.mapper.toEntities
 import com.shykial.kScrapperCore.mapper.toExtractingDetailsResponse
 import com.shykial.kScrapperCore.model.entity.Attribute
@@ -26,7 +26,6 @@ import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
-import io.restassured.http.ContentType
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -48,7 +47,7 @@ import generated.com.shykial.kScrapperCore.models.Selector as SelectorInApi
 internal class ExtractingDetailsControllerTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
-    private val extractingDetailsRepository: ExtractingDetailsRepository,
+    private val extractingDetailsRepository: ExtractingDetailsRepository
 ) : RestTest(), MongoDBStarter {
 
     init {
@@ -71,8 +70,7 @@ internal class ExtractingDetailsControllerTest(
             }
 
             Given {
-                contentType(ContentType.JSON)
-                body(sampleExtractingDetailsRequest.toJsonString())
+                jsonBody(sampleExtractingDetailsRequest)
             } When {
                 post()
             } Then {
@@ -80,7 +78,8 @@ internal class ExtractingDetailsControllerTest(
                 extractingBody<AddExtractingDetailsResponse> { response ->
                     assertThat(response.domainId).isEqualTo(request.domainId)
                     val entities = extractingDetailsRepository.findByDomainId(request.domainId)
-                    assertThat(response.extractedFieldsDetails).hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
+                    assertThat(response.extractedFieldsDetails)
+                        .hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
                 }
             }
         }
@@ -163,22 +162,19 @@ internal class ExtractingDetailsControllerTest(
             )
 
             Given {
-                contentType(ContentType.JSON)
-                body(updateRequest.toJsonString())
+                jsonBody(updateRequest)
             } When {
                 put("/${initialExtractingDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
                 extractingDetailsRepository.findById(initialExtractingDetails.id)!!.run {
-                    assertFieldsToBeEqual(
-                        fieldName to updateRequest.fieldName,
-                        selector.index to updateRequest.selector.index,
-                        selector.value to updateRequest.selector.value,
-                        extractedProperty to Attribute(updateRequest.extractedPropertyValue!!),
-                    )
+                    assertThat(fieldName).isEqualTo(updateRequest.fieldName)
+                    assertThat(selector.index).isEqualTo(updateRequest.selector.index)
+                    assertThat(selector.value).isEqualTo(updateRequest.selector.value)
+                    assertThat(extractedProperty).isEqualTo(Attribute(updateRequest.extractedPropertyValue!!))
                     assertThat(regexReplacements)
-                        .usingComparatorForType(regexComparator, RegexReplacement::class.java)
+                        .usingTypeComparator(regexComparator)
                         .isEqualTo(updateRequest.regexReplacements?.toListInEntity())
                 }
             }

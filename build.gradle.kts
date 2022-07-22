@@ -6,7 +6,7 @@ val restAssuredVersion = "5.1.1"
 val testContainersVersion = "1.17.3"
 
 plugins {
-    id("org.springframework.boot") version "2.7.1"
+    id("org.springframework.boot") version "2.7.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.openapi.generator") version "5.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
@@ -92,8 +92,7 @@ openApiGenerate {
             "interfaceOnly" to "true",
             "useTags" to "true",
             "enumPropertyNaming" to "UPPERCASE",
-            "delegatePattern" to "true",
-            "reactive" to "true",
+            "reactive" to "true"
         )
     )
 }
