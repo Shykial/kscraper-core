@@ -8,7 +8,7 @@ val testContainersVersion = "1.17.3"
 plugins {
     id("org.springframework.boot") version "2.7.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.openapi.generator") version "5.3.0"
+    id("org.openapi.generator") version "6.0.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("org.jetbrains.kotlinx.kover") version "0.5.1"
     kotlin("jvm") version "1.7.10"
@@ -92,6 +92,7 @@ openApiGenerate {
             "interfaceOnly" to "true",
             "useTags" to "true",
             "enumPropertyNaming" to "UPPERCASE",
+            "serializationLibrary" to "jackson",
             "reactive" to "true"
         )
     )
