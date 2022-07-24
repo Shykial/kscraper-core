@@ -1,6 +1,6 @@
 spring:
   data:
     mongodb:
-      username: kscrapper_core_root
-      password: kscrapper_core_pass
-      database: kscrapper_core_db
+      username: kscraper_core_root
+      password: kscraper_core_pass
+      database: kscraper_core_db

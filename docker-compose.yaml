@@ -3,9 +3,9 @@ services:
   mongo-db:
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: kscrapper_core_root
-      MONGO_INITDB_ROOT_PASSWORD: kscrapper_core_pass
-      MONGO_INITDB_DATABASE: kscrapper_core_db
+      MONGO_INITDB_ROOT_USERNAME: kscraper_core_root
+      MONGO_INITDB_ROOT_PASSWORD: kscraper_core_pass
+      MONGO_INITDB_DATABASE: kscraper_core_db
     ports:
       - "27017:27017"
   mongo-express:
@@ -14,6 +14,6 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: kscrapper_core_root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: kscrapper_core_pass
+      ME_CONFIG_MONGODB_ADMINUSERNAME: kscraper_core_root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: kscraper_core_pass
       ME_CONFIG_MONGODB_SERVER: mongo-db

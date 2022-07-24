@@ -1,1 +1,1 @@
-rootProject.name = "kscrapper-core"
+rootProject.name = "kscraper-core"
