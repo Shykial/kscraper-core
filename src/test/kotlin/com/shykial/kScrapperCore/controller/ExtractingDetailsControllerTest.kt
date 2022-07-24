@@ -23,9 +23,13 @@ import com.shykial.kScrapperCore.starter.MongoDBStarter
 import generated.com.shykial.kScrapperCore.models.AddExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractedFieldDetails
 import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType
+import generated.com.shykial.kScrapperCore.models.ExtractedPropertyType.ATTRIBUTE
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsRequest
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ExtractingDetailsUpdateRequest
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -65,9 +69,7 @@ internal class ExtractingDetailsControllerTest(
         @Test
         fun `should properly add extracting details on POST request`() = runTest {
             val request = sampleExtractingDetailsRequest
-            extractingDetailsRepository.findByDomainId(request.domainId).let {
-                assertThat(it).isEmpty()
-            }
+            extractingDetailsRepository.findByDomainId(request.domainId).shouldBeEmpty()
 
             Given {
                 jsonBody(sampleExtractingDetailsRequest)
@@ -76,10 +78,10 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
-                    assertThat(response.domainId).isEqualTo(request.domainId)
+                    response.domainId shouldBe request.domainId
                     val entities = extractingDetailsRepository.findByDomainId(request.domainId)
-                    assertThat(response.extractedFieldsDetails)
-                        .hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
+                    response.extractedFieldsDetails shouldContainExactlyInAnyOrder
+                            entities.map { it.toExtractingDetailsResponse() }
                 }
             }
         }
@@ -98,7 +100,7 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
-                    assertThat(response).hasSameElementsAs(entities.map { it.toExtractingDetailsResponse() })
+                    response shouldContainExactlyInAnyOrder entities.map { it.toExtractingDetailsResponse() }
                 }
             }
         }
@@ -113,7 +115,7 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<ExtractingDetailsResponse> {
-                    assertThat(it).isEqualTo(entity.toExtractingDetailsResponse())
+                    it shouldBe entity.toExtractingDetailsResponse()
                 }
             }
         }
@@ -133,7 +135,7 @@ internal class ExtractingDetailsControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
-                    assertThat(response).hasSameElementsAs(randomEntities.map { it.toExtractingDetailsResponse() })
+                    response shouldContainExactlyInAnyOrder randomEntities.map { it.toExtractingDetailsResponse() }
                 }
             }
         }
@@ -153,7 +155,7 @@ internal class ExtractingDetailsControllerTest(
             val updateRequest = ExtractingDetailsUpdateRequest(
                 fieldName = initialExtractingDetails.fieldName,
                 selector = with(initialExtractingDetails.selector) { SelectorInApi(value = value, index = index + 1) },
-                extractedPropertyType = ExtractedPropertyType.ATTRIBUTE,
+                extractedPropertyType = ATTRIBUTE,
                 extractedPropertyValue = "newValue",
                 regexReplacements = listOf(
                     RegexReplacementInApi(initialRegexString.toBase64String(), "replacement"),
@@ -169,10 +171,10 @@ internal class ExtractingDetailsControllerTest(
                 status(HttpStatus.NO_CONTENT)
 
                 extractingDetailsRepository.findById(initialExtractingDetails.id)!!.run {
-                    assertThat(fieldName).isEqualTo(updateRequest.fieldName)
-                    assertThat(selector.index).isEqualTo(updateRequest.selector.index)
-                    assertThat(selector.value).isEqualTo(updateRequest.selector.value)
-                    assertThat(extractedProperty).isEqualTo(Attribute(updateRequest.extractedPropertyValue!!))
+                    fieldName shouldBe updateRequest.fieldName
+                    selector.index shouldBe updateRequest.selector.index
+                    selector.value shouldBe updateRequest.selector.value
+                    extractedProperty shouldBe Attribute(updateRequest.extractedPropertyValue!!)
                     assertThat(regexReplacements)
                         .usingTypeComparator(regexComparator)
                         .isEqualTo(updateRequest.regexReplacements?.toListInEntity())
@@ -190,9 +192,7 @@ private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(
             fieldName = randomAlphabetic(10),
             selector = SelectorInApi(value = randomAlphabetic(4), index = Random.nextInt(2)),
             extractedPropertyType = extractedPropertyType,
-            extractedPropertyValue = extractedPropertyType.let {
-                if (it == ExtractedPropertyType.ATTRIBUTE) randomAlphabetic(10) else null
-            },
+            extractedPropertyValue = randomAlphabetic(10).takeIf { extractedPropertyType == ATTRIBUTE },
             regexReplacements = List(Random.nextInt(0..5)) {
                 RegexReplacementInApi(sampleRegexString().toBase64String(), randomAlphabetic(10))
             }

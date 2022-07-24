@@ -36,7 +36,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("it.skrape:skrapeit:1.2.1")
+    implementation("it.skrape:skrapeit:1.2.1") {
+        exclude(group = "ch.qos.logback")
+    }
     implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
 
@@ -45,6 +47,7 @@ dependencies {
         exclude(module = "mockito-core")
         exclude(module = "mockito-junit-jupiter")
     }
+    testImplementation("io.kotest:kotest-assertions-core:5.3.2")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testImplementation("org.testcontainers:testcontainers")

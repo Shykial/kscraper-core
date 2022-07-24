@@ -9,6 +9,8 @@ import com.shykial.kScrapperCore.helper.Then
 import com.shykial.kScrapperCore.helper.When
 import com.shykial.kScrapperCore.helper.extractingBody
 import com.shykial.kScrapperCore.helper.saveIn
+import com.shykial.kScrapperCore.helpers.plusMinutes
+import com.shykial.kScrapperCore.helpers.shouldBeWithin
 import com.shykial.kScrapperCore.model.entity.ApplicationUser
 import com.shykial.kScrapperCore.model.entity.UserRole
 import com.shykial.kScrapperCore.repository.ApplicationUserRepository
@@ -20,12 +22,13 @@ import generated.com.shykial.kScrapperCore.models.ErrorType
 import generated.com.shykial.kScrapperCore.models.IdResponse
 import generated.com.shykial.kScrapperCore.models.LoginRequest
 import generated.com.shykial.kScrapperCore.models.RegisterUserRequest
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -33,8 +36,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.Duration
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 private const val AUTH_ENDPOINT = "/auth"
 
@@ -70,9 +73,7 @@ internal class AuthControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<AuthToken> {
-                    JWT.decode(it.token).run {
-                        assertProperTokenGenerated(validUser)
-                    }
+                    JWT.decode(it.token).assertProperTokenGenerated(validUser)
                 }
             }
         }
@@ -84,9 +85,7 @@ internal class AuthControllerTest(
                 email = "proper@email.com",
                 password = "properPassword4812$"
             )
-            applicationUserRepository.findAll().toList().let {
-                assertThat(it).isEmpty()
-            }
+            applicationUserRepository.findAll().toList().shouldBeEmpty()
 
             Given {
                 jsonBody(request)
@@ -99,14 +98,6 @@ internal class AuthControllerTest(
                 }
             }
         }
-    }
-
-    private fun ApplicationUser.assertProperUserPersisted(
-        request: RegisterUserRequest
-    ) {
-        assertThat(login).isEqualTo(request.login)
-        assertThat(email).isEqualTo(request.email)
-        assertThat(passwordEncoder.matches(request.password, passwordHash)).isTrue
     }
 
     @Nested
@@ -123,7 +114,7 @@ internal class AuthControllerTest(
             } Then {
                 status(HttpStatus.UNAUTHORIZED)
                 extractingBody<ErrorResponse> {
-                    assertThat(it.errorType).isEqualTo(ErrorType.AUTHENTICATION_FAILURE)
+                    it.errorType shouldBe ErrorType.AUTHORIZATION_FAILURE
                 }
             }
         }
@@ -142,7 +133,7 @@ internal class AuthControllerTest(
                 post("/register")
             } Then {
                 status(HttpStatus.BAD_REQUEST)
-                applicationUserRepository.findAll().toList().run { assertThat(this).isEmpty() }
+                applicationUserRepository.findAll().toList().shouldBeEmpty()
             }
         }
 
@@ -165,9 +156,19 @@ internal class AuthControllerTest(
                 post("/register")
             } Then {
                 status(HttpStatus.CONFLICT)
-                assertThat(applicationUserRepository.findByLogin(existingUser.login)).isEqualTo(existingUser)
+                applicationUserRepository.findByLogin(existingUser.login) shouldBe existingUser
             }
         }
+
+    }
+
+    private fun ApplicationUser.assertProperUserPersisted(
+        request: RegisterUserRequest
+    ) {
+        login shouldBe request.login
+        login shouldBe request.login
+        email shouldBe request.email
+        passwordEncoder.matches(request.password, passwordHash).shouldBeTrue()
     }
 
     private fun sampleValidUser(rawPassword: String) = ApplicationUser(
@@ -179,13 +180,13 @@ internal class AuthControllerTest(
     )
 
     private fun DecodedJWT.assertProperTokenGenerated(validUser: ApplicationUser) {
-        assertThat(subject).isEqualTo(validUser.login)
-        assertThat(claims[jwtProperties.rolesClaimName]?.asList(String::class.java)).isEqualTo(listOf(validUser.role.name))
-        assertThat(issuer).isEqualTo(jwtProperties.issuer)
-        assertThat(issuedAt.toInstant()).isCloseTo(Instant.now(), within(1, ChronoUnit.MINUTES))
-        assertThat(expiresAt.toInstant()).isCloseTo(
-            Instant.now().plusSeconds(60 * jwtProperties.validityInMinutes),
-            within(1, ChronoUnit.MINUTES)
+        subject shouldBe validUser.login
+        claims[jwtProperties.rolesClaimName]?.asList(String::class.java) shouldBe listOf(validUser.role.name)
+        issuer shouldBe jwtProperties.issuer
+        issuedAt.toInstant().shouldBeWithin(Duration.ofMinutes(1), Instant.now())
+        expiresAt.toInstant().shouldBeWithin(
+            margin = Duration.ofMinutes(1),
+            other = Instant.now().plusMinutes(jwtProperties.validityInMinutes)
         )
     }
 }

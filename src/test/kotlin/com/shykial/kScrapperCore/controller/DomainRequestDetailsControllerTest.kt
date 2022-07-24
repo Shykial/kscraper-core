@@ -16,11 +16,12 @@ import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScrapperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScrapperCore.models.ErrorResponse
 import generated.com.shykial.kScrapperCore.models.ErrorType
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -60,7 +61,7 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
-                    assertThat(it).isEqualTo(entity.toResponse())
+                    it shouldBe entity.toResponse()
                 }
             }
         }
@@ -74,7 +75,7 @@ internal class DomainRequestDetailsControllerTest(
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
-                    assertThat(it).isEqualTo(entity.toResponse())
+                    it shouldBe entity.toResponse()
                 }
             }
         }
@@ -82,9 +83,7 @@ internal class DomainRequestDetailsControllerTest(
         @Test
         fun `should add new domain request detail on POST request`() = runTest {
             val request = sampleDomainRequestDetailsRequest
-            domainRequestDetailsRepository.findByDomainName(request.domainName).run {
-                assertThat(this).isNull()
-            }
+            domainRequestDetailsRepository.findByDomainName(request.domainName).shouldBeNull()
 
             Given {
                 jsonBody(request)
@@ -94,7 +93,7 @@ internal class DomainRequestDetailsControllerTest(
                 status(HttpStatus.CREATED)
                 extractingBody<DomainRequestDetailsResponse> {
                     val entity = domainRequestDetailsRepository.findByDomainName(request.domainName)
-                    assertThat(it).isEqualTo(entity?.toResponse())
+                    it shouldBe entity?.toResponse()
                 }
             }
         }
@@ -117,9 +116,9 @@ internal class DomainRequestDetailsControllerTest(
                 status(HttpStatus.NO_CONTENT)
 
                 domainRequestDetailsRepository.findById(initialDomainRequestDetails.id)!!.run {
-                    assertThat(domainName).isEqualTo(updateRequest.domainName)
-                    assertThat(requestHeaders).isEqualTo(updateRequest.requestHeaders)
-                    assertThat(requestTimeoutInMillis).isEqualTo(updateRequest.requestTimeoutInMillis)
+                    domainName shouldBe updateRequest.domainName
+                    requestHeaders shouldBe updateRequest.requestHeaders
+                    requestTimeoutInMillis shouldBe updateRequest.requestTimeoutInMillis
                 }
             }
         }
@@ -138,7 +137,7 @@ internal class DomainRequestDetailsControllerTest(
                 } Then {
                     status(HttpStatus.NOT_FOUND)
                     extractingBody<ErrorResponse> {
-                        assertThat(it.errorType).isEqualTo(ErrorType.NOT_FOUND)
+                        it.errorType shouldBe ErrorType.NOT_FOUND
                     }
                 }
             }
