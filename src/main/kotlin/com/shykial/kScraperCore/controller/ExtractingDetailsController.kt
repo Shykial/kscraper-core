@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ExtractingDetailsController(
-    private val extractingDetailsService: ExtractingDetailsService,
+    private val extractingDetailsService: ExtractingDetailsService
 ) : ExtractingDetailsApi {
     private val log = KotlinLogging.logger { }
 
@@ -41,12 +41,12 @@ class ExtractingDetailsController(
     }.toResponseEntity()
 
     override suspend fun addExtractingDetails(
-        extractingDetailsRequest: ExtractingDetailsRequest,
+        extractingDetailsRequest: ExtractingDetailsRequest
     ): ResponseEntity<AddExtractingDetailsResponse> = extractingDetailsRequest
         .also {
             log.info(
                 "Received request for adding extracting details for domainId: ${it.domainId}" +
-                        ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
+                    ", for fields: ${it.extractedFieldsDetails.map(ExtractedFieldDetails::fieldName)}"
             )
         }.runSuspend(extractingDetailsService::addExtractingDetails)
         .toResponse()
@@ -54,7 +54,7 @@ class ExtractingDetailsController(
 
     override suspend fun updateExtractingDetails(
         id: String,
-        extractingDetailsUpdateRequest: ExtractingDetailsUpdateRequest,
+        extractingDetailsUpdateRequest: ExtractingDetailsUpdateRequest
     ): ResponseEntity<Unit> {
         log.info("Received update extracting details request for extractingDetails ID: $id")
         extractingDetailsService.updateExtractingDetails(id, extractingDetailsUpdateRequest)

@@ -13,7 +13,7 @@ import it.skrape.fetcher.response
 import it.skrape.fetcher.skrape
 import it.skrape.selects.Doc
 import mu.KotlinLogging
-import java.util.*
+import java.util.UUID
 
 object SkrapeItDataScraper : ScrapeForDataUseCase {
     private val log = KotlinLogging.logger { }
@@ -34,7 +34,7 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
         response {
             log.debug {
                 "[$requestID] Received response with status $responseStatus" +
-                        " after ${System.currentTimeMillis() - startMillis} ms"
+                    " after ${System.currentTimeMillis() - startMillis} ms"
             }
             htmlDocument {
                 ScrapedData(

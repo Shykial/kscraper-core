@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.endpoint
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -27,7 +27,6 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -42,7 +41,7 @@ import java.time.Instant
 private const val AUTH_ENDPOINT = "/auth"
 
 @SpringBootTest
-internal class AuthControllerTest(
+internal class AuthEndpointTest(
     override val objectMapper: ObjectMapper,
     override val webTestClient: WebTestClient,
     private val applicationUserRepository: ApplicationUserRepository,
@@ -55,8 +54,8 @@ internal class AuthControllerTest(
     }
 
     @BeforeEach
-    fun setup() {
-        runBlocking { applicationUserRepository.deleteAll() }
+    fun setup() = runTest {
+        applicationUserRepository.deleteAll()
     }
 
     @Nested
@@ -159,7 +158,6 @@ internal class AuthControllerTest(
                 applicationUserRepository.findByLogin(existingUser.login) shouldBe existingUser
             }
         }
-
     }
 
     private fun ApplicationUser.assertProperUserPersisted(

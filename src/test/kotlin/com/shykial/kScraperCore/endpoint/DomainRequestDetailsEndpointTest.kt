@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.endpoint
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
@@ -19,7 +19,6 @@ import generated.com.shykial.kScraperCore.models.ErrorType
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +31,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "/domain-request-details"
 
 @SpringBootTest
-internal class DomainRequestDetailsControllerTest(
+internal class DomainRequestDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository
@@ -43,8 +42,8 @@ internal class DomainRequestDetailsControllerTest(
     }
 
     @BeforeEach
-    fun setup() {
-        runBlocking { domainRequestDetailsRepository.deleteAll() }
+    fun setup() = runTest {
+        domainRequestDetailsRepository.deleteAll()
     }
 
     @Nested

@@ -18,7 +18,7 @@ abstract class RestTest {
         RestAssuredWebTestClient.webTestClient(webTestClient)
     }
 
-    fun WebTestClientRequestSpecification.jsonBody(body: Any?) =
+    fun WebTestClientRequestSpecification.jsonBody(body: Any?): WebTestClientRequestSpecification =
         contentType(ContentType.JSON)
             .body(body.toJsonString())
 

@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.endpoint
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
@@ -31,7 +31,6 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
@@ -48,7 +47,7 @@ import generated.com.shykial.kScraperCore.models.RegexReplacement as RegexReplac
 import generated.com.shykial.kScraperCore.models.Selector as SelectorInApi
 
 @SpringBootTest
-internal class ExtractingDetailsControllerTest(
+internal class ExtractingDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     private val extractingDetailsRepository: ExtractingDetailsRepository
@@ -59,8 +58,8 @@ internal class ExtractingDetailsControllerTest(
     }
 
     @BeforeEach
-    fun setup() {
-        runBlocking { extractingDetailsRepository.deleteAll() }
+    fun setup() = runTest {
+        extractingDetailsRepository.deleteAll()
     }
 
     @Nested
@@ -81,7 +80,7 @@ internal class ExtractingDetailsControllerTest(
                     response.domainId shouldBe request.domainId
                     val entities = extractingDetailsRepository.findByDomainId(request.domainId)
                     response.extractedFieldsDetails shouldContainExactlyInAnyOrder
-                            entities.map { it.toExtractingDetailsResponse() }
+                        entities.map { it.toExtractingDetailsResponse() }
                 }
             }
         }
