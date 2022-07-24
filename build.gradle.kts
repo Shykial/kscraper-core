@@ -89,7 +89,7 @@ openApiGenerate {
     inputSpec.set("$rootDir/src/main/resources/static/openapi.yaml")
     generatorName.set("kotlin-spring")
     outputDir.set("$buildDir/generated-resources")
-    packageName.set("generated.com.shykial.kScrapperCore")
+    packageName.set("generated.com.shykial.kScraperCore")
     configOptions.putAll(
         mapOf(
             "interfaceOnly" to "true",

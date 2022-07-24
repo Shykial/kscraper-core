@@ -11,7 +11,7 @@ security:
   jwt:
     secret: temp
     validity-in-minutes: 15
-    issuer: k-scrapper-core
+    issuer: k-scraper-core
     roles-claim-name: roles
 
 logging:
