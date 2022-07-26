@@ -11,6 +11,7 @@ val javaJwtVersion: String by project
 val kotestVersion: String by project
 val kotlinLoggingVersion: String by project
 val skrapeItVersion: String by project
+val mockServerClientVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -61,6 +62,8 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
+    testImplementation("org.testcontainers:mockserver")
+    testImplementation("org.mock-server:mockserver-client-java:$mockServerClientVersion")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockKVersion")
 }
@@ -73,7 +76,12 @@ dependencyManagement {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
+        freeCompilerArgs =
+            listOf(
+                "-Xjsr305=strict",
+                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-Xcontext-receivers"
+            )
         jvmTarget = "17"
     }
 }
