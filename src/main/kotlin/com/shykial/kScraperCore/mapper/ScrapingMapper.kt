@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.mapper
 
 import com.shykial.kScraperCore.model.ScrapedData
 import generated.com.shykial.kScraperCore.models.ScrapedDataResponse

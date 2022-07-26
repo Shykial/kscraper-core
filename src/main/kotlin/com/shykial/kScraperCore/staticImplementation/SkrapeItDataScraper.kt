@@ -49,17 +49,17 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
         extractingDetails: ExtractingDetails
     ): Pair<String, String> = extractingDetails.let { details ->
         val element = details.selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
-        val elementText = element.run {
+        val rawText = element.run {
             when (val extractedPropertyState = details.extractedProperty) {
                 is Attribute -> attribute(extractedPropertyState.attributeName)
                 is OwnText -> ownText
                 is Text -> text
             }
         }
-        details.fieldName to elementText.run {
-            details.regexReplacements?.fold(this) { current, (regex, replacement) ->
-                current.replace(regex, replacement)
-            } ?: this
-        }
+        val filteredText = details.regexFilter?.find(rawText)?.value ?: rawText
+        val fieldValue = details.regexReplacements
+            ?.fold(filteredText) { current, (regex, replacement) -> current.replace(regex, replacement) }
+            ?: filteredText
+        details.fieldName to fieldValue
     }
 }

@@ -24,6 +24,7 @@ fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
         fieldName = it.fieldName,
         selector = it.selector.toEntityModel(),
         extractedProperty = extractedPropertyFrom(it.extractedPropertyType, it.extractedPropertyValue),
+        regexFilter = it.regexFilter?.decodeBase64()?.toRegex(),
         regexReplacements = it.regexReplacements?.map { rr -> rr.toEntityModel() }?.toMutableList()
     )
 }
@@ -36,6 +37,7 @@ fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
         selector = SelectorInApi(value = selector.value, index = selector.index),
         extractedPropertyType = extractedPropertyType,
         extractedPropertyValue = extractedPropertyValue,
+        regexFilter = regexFilter?.pattern?.toBase64String(),
         regexReplacements = regexReplacements?.map { it.toApiModel() }
     )
 }
@@ -56,7 +58,7 @@ fun ExtractingDetails.updateWith(request: ExtractingDetailsUpdateRequest) = appl
 }
 
 private fun RegexReplacementInApi.toEntityModel() = RegexReplacement(
-    regex = decodeBase64(base64EncodedRegex).toRegex(),
+    regex = base64EncodedRegex.decodeBase64().toRegex(),
     replacement = replacement
 )
 
@@ -77,12 +79,14 @@ private fun SelectorInApi.toEntityModel() = Selector(
     index = index
 )
 
-private fun extractedPropertyFrom(extractedPropertyType: ExtractedPropertyType, extractedPropertyValue: String?) =
-    when (extractedPropertyType) {
-        ExtractedPropertyType.TEXT -> Text
-        ExtractedPropertyType.OWN_TEXT -> OwnText
-        ExtractedPropertyType.ATTRIBUTE -> Attribute(
-            extractedPropertyValue
-                ?: throw InvalidInputException("No value property value provided for Attribute property type")
-        )
-    }
+private fun extractedPropertyFrom(
+    extractedPropertyType: ExtractedPropertyType,
+    extractedPropertyValue: String?
+) = when (extractedPropertyType) {
+    ExtractedPropertyType.TEXT -> Text
+    ExtractedPropertyType.OWN_TEXT -> OwnText
+    ExtractedPropertyType.ATTRIBUTE -> Attribute(
+        extractedPropertyValue
+            ?: throw InvalidInputException("No value property value provided for Attribute property type")
+    )
+}

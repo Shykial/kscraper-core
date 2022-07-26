@@ -192,6 +192,7 @@ private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(
             selector = SelectorInApi(value = randomAlphabetic(4), index = Random.nextInt(2)),
             extractedPropertyType = extractedPropertyType,
             extractedPropertyValue = randomAlphabetic(10).takeIf { extractedPropertyType == ATTRIBUTE },
+            regexFilter = sampleRegexString().toBase64String(),
             regexReplacements = List(Random.nextInt(0..5)) {
                 RegexReplacementInApi(sampleRegexString().toBase64String(), randomAlphabetic(10))
             }
@@ -206,5 +207,5 @@ private val regexComparator = Comparator<RegexReplacement> { first, second ->
 private fun sampleRegexString() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""
 
 private fun List<RegexReplacementInApi>.toListInEntity() = map {
-    RegexReplacement(decodeBase64(it.base64EncodedRegex).toRegex(), it.replacement)
+    RegexReplacement(it.base64EncodedRegex.decodeBase64().toRegex(), it.replacement)
 }

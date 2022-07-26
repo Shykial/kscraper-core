@@ -356,6 +356,9 @@ components:
           $ref: '#/components/schemas/ExtractedPropertyType'
         extractedPropertyValue:
           type: string
+        regexFilter:
+          type: string
+          description: base64 encoded regex filter
         regexReplacements:
           type: array
           items:

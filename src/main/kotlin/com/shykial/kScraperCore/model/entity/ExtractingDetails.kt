@@ -13,7 +13,8 @@ data class ExtractingDetails(
     var fieldName: String,
     var selector: Selector,
     var extractedProperty: ExtractedProperty,
-    var regexReplacements: MutableList<RegexReplacement>? = mutableListOf(DEFAULT_REGEX_REPLACEMENT),
+    var regexFilter: Regex? = null,
+    var regexReplacements: MutableList<RegexReplacement>? = mutableListOf(DEFAULT_REGEX_REPLACEMENT)
 ) : BaseDocument()
 
 sealed interface ExtractedProperty
@@ -24,7 +25,7 @@ data class Attribute(val attributeName: String) : ExtractedProperty
 
 data class Selector(
     val value: String,
-    val index: Int = 0,
+    val index: Int = 0
 )
 
 data class RegexReplacement(val regex: Regex, val replacement: String)
