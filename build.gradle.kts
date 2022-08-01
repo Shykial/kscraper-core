@@ -76,12 +76,11 @@ dependencyManagement {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs =
-            listOf(
-                "-Xjsr305=strict",
-                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "-Xcontext-receivers"
-            )
+        freeCompilerArgs = listOf(
+            "-Xjsr305=strict",
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xcontext-receivers"
+        )
         jvmTarget = "17"
     }
 }

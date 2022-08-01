@@ -13,7 +13,7 @@ private val DOMAIN_PART_FILTER_REGEX = Regex("""http(s)?://|www\.|/.*""")
 
 @Service
 class ScrapingService(
-    private val DomainRequestDetailsRepository: DomainRequestDetailsRepository,
+    private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
     private val scrapeForDataUseCase: ScrapeForDataUseCase
 ) {
@@ -25,7 +25,7 @@ class ScrapingService(
     ): ScrapedData = coroutineScope {
         log.info("Scraping url $resourceUrl for fields $scrapedFields")
         val domainName = resourceUrl.readDomainName()
-        val domainDetails = DomainRequestDetailsRepository.findByDomainName(domainName)
+        val domainDetails = domainRequestDetailsRepository.findByDomainName(domainName)
             ?: throw NotFoundException("Domain request details for domain name $domainName not found")
         val extractingDetails = scrapedFields?.let {
             extractingDetailsRepository.findByDomainIdAndFieldNameIn(domainDetails.id, it)

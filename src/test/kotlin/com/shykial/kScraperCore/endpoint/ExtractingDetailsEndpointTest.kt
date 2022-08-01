@@ -206,5 +206,8 @@ private val regexComparator = Comparator<RegexReplacement> { first, second ->
 private fun sampleRegexString() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""
 
 private fun List<RegexReplacementInApi>.toListInEntity() = map {
-    RegexReplacement(it.base64EncodedRegex.decodeBase64().toRegex(), it.replacement)
+    RegexReplacement(
+        regex = it.base64EncodedRegex.decodeBase64().toRegex(),
+        replacement = it.replacement
+    )
 }

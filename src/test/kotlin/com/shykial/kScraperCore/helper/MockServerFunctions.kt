@@ -17,4 +17,5 @@ inline infix fun ForwardChainExpectation.respond(
     responseSetup: HttpResponse.() -> Unit
 ): Array<Expectation> = respond(HttpResponse().apply(responseSetup))
 
+context(HttpRequest)
 fun Map<String, String>.toMockServerHeaders(): List<Header> = map { Header(it.key, it.value) }
