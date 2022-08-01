@@ -8,9 +8,9 @@ import com.shykial.kScraperCore.helper.RestTest
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
+import com.shykial.kScraperCore.helper.plusMinutes
 import com.shykial.kScraperCore.helper.saveIn
-import com.shykial.kScraperCore.helpers.plusMinutes
-import com.shykial.kScraperCore.helpers.shouldBeWithin
+import com.shykial.kScraperCore.helper.shouldBeWithin
 import com.shykial.kScraperCore.model.entity.ApplicationUser
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.repository.ApplicationUserRepository

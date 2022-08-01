@@ -1,0 +1,10 @@
+{
+  "fieldName": "price",
+  "selector": {
+    "value": "head script[type=\"application/ld+json\"]"
+  },
+  "extractedProperty": {
+    "name": "HTML"
+  },
+  "regexFilter": "(?<=\"price\":\\s\")\\d{1,}\\.\\d{2}"
+}

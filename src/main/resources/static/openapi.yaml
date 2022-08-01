@@ -385,6 +385,7 @@ components:
       enum:
         - TEXT
         - OWN_TEXT
+        - HTML
         - ATTRIBUTE
 
     DomainRequestDetailsRequest:

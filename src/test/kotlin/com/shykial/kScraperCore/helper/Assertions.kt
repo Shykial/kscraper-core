@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.helpers
+package com.shykial.kScraperCore.helper
 
 import io.kotest.matchers.date.shouldBeBetween
 import java.time.Duration

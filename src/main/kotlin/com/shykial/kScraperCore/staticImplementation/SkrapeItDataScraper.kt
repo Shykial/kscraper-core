@@ -1,11 +1,9 @@
 package com.shykial.kScraperCore.staticImplementation
 
 import com.shykial.kScraperCore.model.ScrapedData
-import com.shykial.kScraperCore.model.entity.Attribute
 import com.shykial.kScraperCore.model.entity.DomainRequestDetails
+import com.shykial.kScraperCore.model.entity.ExtractedProperty
 import com.shykial.kScraperCore.model.entity.ExtractingDetails
-import com.shykial.kScraperCore.model.entity.OwnText
-import com.shykial.kScraperCore.model.entity.Text
 import com.shykial.kScraperCore.useCase.ScrapeForDataUseCase
 import it.skrape.core.htmlDocument
 import it.skrape.fetcher.AsyncFetcher
@@ -50,10 +48,11 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
     ): Pair<String, String> = extractingDetails.let { details ->
         val element = details.selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
         val rawText = element.run {
-            when (val extractedPropertyState = details.extractedProperty) {
-                is Attribute -> attribute(extractedPropertyState.attributeName)
-                is OwnText -> ownText
-                is Text -> text
+            when (val extractedProperty = details.extractedProperty) {
+                is ExtractedProperty.Attribute -> attribute(extractedProperty.attributeName)
+                is ExtractedProperty.OwnText -> ownText
+                is ExtractedProperty.Text -> text
+                is ExtractedProperty.Html -> html
             }
         }
         val filteredText = details.regexFilter?.find(rawText)?.value ?: rawText

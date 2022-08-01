@@ -13,9 +13,8 @@ import com.shykial.kScraperCore.helper.toBase64String
 import com.shykial.kScraperCore.helper.usingTypeComparator
 import com.shykial.kScraperCore.mapper.toEntities
 import com.shykial.kScraperCore.mapper.toExtractingDetailsResponse
-import com.shykial.kScraperCore.model.entity.Attribute
+import com.shykial.kScraperCore.model.entity.ExtractedProperty
 import com.shykial.kScraperCore.model.entity.ExtractingDetails
-import com.shykial.kScraperCore.model.entity.OwnText
 import com.shykial.kScraperCore.model.entity.RegexReplacement
 import com.shykial.kScraperCore.model.entity.Selector
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
@@ -146,7 +145,7 @@ internal class ExtractingDetailsEndpointTest(
                 domainId = "sampleDomainId",
                 fieldName = "sampleFieldName",
                 selector = Selector(value = "sampleSelector", index = 0),
-                extractedProperty = OwnText,
+                extractedProperty = ExtractedProperty.OwnText,
                 regexReplacements = mutableListOf(
                     RegexReplacement(initialRegexString.toRegex(), "replacement")
                 )
@@ -173,7 +172,7 @@ internal class ExtractingDetailsEndpointTest(
                     fieldName shouldBe updateRequest.fieldName
                     selector.index shouldBe updateRequest.selector.index
                     selector.value shouldBe updateRequest.selector.value
-                    extractedProperty shouldBe Attribute(updateRequest.extractedPropertyValue!!)
+                    extractedProperty shouldBe ExtractedProperty.Attribute(updateRequest.extractedPropertyValue!!)
                     assertThat(regexReplacements)
                         .usingTypeComparator(regexComparator)
                         .isEqualTo(updateRequest.regexReplacements?.toListInEntity())

@@ -1,0 +1,19 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "htmlFile": {
+        "type": "string"
+      },
+      "expectedFieldValue": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "htmlFile",
+      "expectedFieldValue"
+    ],
+    "additionalProperties": false
+  }
+}

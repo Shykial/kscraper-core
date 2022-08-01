@@ -17,11 +17,12 @@ data class ExtractingDetails(
     var regexReplacements: MutableList<RegexReplacement>? = mutableListOf(DEFAULT_REGEX_REPLACEMENT)
 ) : BaseDocument()
 
-sealed interface ExtractedProperty
-
-object Text : ExtractedProperty
-object OwnText : ExtractedProperty
-data class Attribute(val attributeName: String) : ExtractedProperty
+sealed interface ExtractedProperty {
+    object Text : ExtractedProperty
+    object OwnText : ExtractedProperty
+    object Html : ExtractedProperty
+    data class Attribute(val attributeName: String) : ExtractedProperty
+}
 
 data class Selector(
     val value: String,
