@@ -25,7 +25,6 @@ import generated.com.shykial.kScraperCore.models.RegisterUserRequest
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -49,10 +48,6 @@ internal class AuthEndpointTest(
     private val jwtProperties: JwtProperties
 ) : RestTest(), MongoDBStarter {
 
-    init {
-        RestAssuredWebTestClient.basePath = AUTH_ENDPOINT
-    }
-
     @BeforeEach
     fun setup() = runTest {
         applicationUserRepository.deleteAll()
@@ -68,7 +63,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(loginRequest)
             } When {
-                post("/login")
+                post("$AUTH_ENDPOINT/login")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<AuthToken> {
@@ -89,7 +84,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<IdResponse> { response ->
@@ -109,7 +104,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(invalidLoginRequest)
             } When {
-                post("/login")
+                post("$AUTH_ENDPOINT/login")
             } Then {
                 status(HttpStatus.UNAUTHORIZED)
                 extractingBody<ErrorResponse> {
@@ -129,7 +124,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(invalidRequest)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.BAD_REQUEST)
                 applicationUserRepository.findAll().toList().shouldBeEmpty()
@@ -152,7 +147,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.CONFLICT)
                 applicationUserRepository.findByLogin(existingUser.login) shouldBe existingUser

@@ -22,6 +22,12 @@ enum class SupportedDomain(
         headersFile = "proper-domain-headers/euro-rtv-domain-headers.json",
         responseMappingsFile = "response-scraping-mappings/euro-rtv-response-mappings.json",
         extractingDetailsInstructionsFile = "proper-extracting-details/euro-rtv-extracting-details.json"
+    ),
+    X_KOM(
+        domainName = "x-kom.pl",
+        headersFile = "proper-domain-headers/x-kom-headers.json",
+        responseMappingsFile = "response-scraping-mappings/x-kom-response-mappings.json",
+        extractingDetailsInstructionsFile = "proper-extracting-details/x-kom-extracting-details.json"
     );
 
     val headers: Map<String, String> = ClassPathResource(headersFile).readAndDeserialize()
@@ -79,6 +85,6 @@ private fun parseExtractingDetails(jsonString: String) = jsonString
                     rootNode["regex"].asText().toRegex(),
                     rootNode["replacement"].asText()
                 )
-            }?.toMutableList()
+            }?.toMutableList() ?: RegexReplacement.DEFAULTS.toMutableList()
         )
     }

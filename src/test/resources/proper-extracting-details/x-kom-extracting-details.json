@@ -1,0 +1,9 @@
+{
+  "fieldName": "price",
+  "selector": {
+    "value": "div.n4n86h-4.eKNYud"
+  },
+  "extractedProperty": {
+    "name": "OWN_TEXT"
+  }
+}

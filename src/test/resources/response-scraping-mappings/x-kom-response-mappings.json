@@ -1,0 +1,18 @@
+[
+  {
+    "htmlFile": "html-responses/x-kom/x-kom-standard-1.html",
+    "expectedFieldValue": "849.00"
+  },
+  {
+    "htmlFile": "html-responses/x-kom/x-kom-standard-2.html",
+    "expectedFieldValue": "3999.00"
+  },
+  {
+    "htmlFile": "html-responses/x-kom/x-kom-discount-1.html",
+    "expectedFieldValue": "1299.00"
+  },
+  {
+    "htmlFile": "html-responses/x-kom/x-kom-discount-2.html",
+    "expectedFieldValue": "469.00"
+  }
+]

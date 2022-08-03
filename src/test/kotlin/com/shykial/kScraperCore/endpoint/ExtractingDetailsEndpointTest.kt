@@ -29,7 +29,6 @@ import generated.com.shykial.kScraperCore.models.ExtractingDetailsUpdateRequest
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
@@ -45,16 +44,14 @@ import kotlin.random.nextInt
 import generated.com.shykial.kScraperCore.models.RegexReplacement as RegexReplacementInApi
 import generated.com.shykial.kScraperCore.models.Selector as SelectorInApi
 
+private const val EXTRACTING_DETAILS_PATH = "/extracting-details"
+
 @SpringBootTest
 internal class ExtractingDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     private val extractingDetailsRepository: ExtractingDetailsRepository
 ) : RestTest(), MongoDBStarter {
-
-    init {
-        RestAssuredWebTestClient.basePath = "/extracting-details"
-    }
 
     @BeforeEach
     fun setup() = runTest {
@@ -72,7 +69,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 jsonBody(sampleExtractingDetailsRequest)
             } When {
-                post()
+                post(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
@@ -94,7 +91,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 queryParam("domainId", domainId)
             } When {
-                get()
+                get(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -109,7 +106,7 @@ internal class ExtractingDetailsEndpointTest(
                 .saveIn(extractingDetailsRepository)
 
             When {
-                get("/${entity.id}")
+                get("$EXTRACTING_DETAILS_PATH/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<ExtractingDetailsResponse> {
@@ -129,7 +126,7 @@ internal class ExtractingDetailsEndpointTest(
                 queryParam("domainId", domainId)
                 queryParam("fieldNames", randomEntities.map { it.fieldName })
             } When {
-                get()
+                get(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -164,7 +161,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 jsonBody(updateRequest)
             } When {
-                put("/${initialExtractingDetails.id}")
+                put("$EXTRACTING_DETAILS_PATH/${initialExtractingDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 

@@ -41,7 +41,7 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
                 ScrapedData(
                     url = resourceUrl,
                     scrapedFields = extractingDetails.associate { extractDetails(it) }
-                ).also { log.info("finished scraping") }
+                ).also { log.info("finished scraping with result: ${it.scrapedFields}") }
             }
         }
     }

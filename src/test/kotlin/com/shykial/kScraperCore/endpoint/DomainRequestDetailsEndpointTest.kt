@@ -18,7 +18,6 @@ import generated.com.shykial.kScraperCore.models.ErrorResponse
 import generated.com.shykial.kScraperCore.models.ErrorType
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.junit.jupiter.api.BeforeEach
@@ -37,10 +36,6 @@ internal class DomainRequestDetailsEndpointTest(
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository
 ) : RestTest(), MongoDBStarter {
 
-    init {
-        RestAssuredWebTestClient.basePath = DOMAIN_REQUEST_DETAILS_ENDPOINT
-    }
-
     @BeforeEach
     fun setup() = runTest {
         domainRequestDetailsRepository.deleteAll()
@@ -56,7 +51,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 queryParam("domainName", entity.domainName)
             } When {
-                get()
+                get(DOMAIN_REQUEST_DETAILS_ENDPOINT)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -70,7 +65,7 @@ internal class DomainRequestDetailsEndpointTest(
             val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
 
             When {
-                get("/${entity.id}")
+                get("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -87,7 +82,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post()
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -110,7 +105,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(updateRequest)
             } When {
-                put("/${initialDomainRequestDetails.id}")
+                put("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${initialDomainRequestDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
@@ -132,7 +127,7 @@ internal class DomainRequestDetailsEndpointTest(
                 Given {
                     queryParam("domainName", randomAlphanumeric(20))
                 } When {
-                    get()
+                    get(DOMAIN_REQUEST_DETAILS_ENDPOINT)
                 } Then {
                     status(HttpStatus.NOT_FOUND)
                     extractingBody<ErrorResponse> {
@@ -149,7 +144,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post()
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
             } Then {
                 status(HttpStatus.CONFLICT)
             }
