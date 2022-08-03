@@ -1,4 +1,3 @@
-import kotlinx.kover.api.CoverageEngine
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -75,10 +74,11 @@ dependencyManagement {
 }
 
 tasks.withType<KotlinCompile> {
+    dependsOn(tasks.openApiGenerate)
     kotlinOptions {
         freeCompilerArgs = listOf(
             "-Xjsr305=strict",
-            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-Xcontext-receivers"
         )
         jvmTarget = "17"
@@ -90,10 +90,6 @@ tasks.withType<Test> {
     testLogging {
         events = setOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
     }
-}
-
-tasks.compileKotlin {
-    dependsOn(tasks.openApiGenerate)
 }
 
 val generatedResourcesDir = "$buildDir/generated-resources"
@@ -123,14 +119,16 @@ ktlint {
 }
 
 kover {
-    coverageEngine.set(CoverageEngine.INTELLIJ)
-}
-
-tasks.koverVerify {
-    rule {
-        bound {
-            minValue = 80
+    verify {
+        rule {
+            bound {
+                minValue = 80
+            }
         }
     }
-    excludes = listOf("generated.*")
+    filters {
+        classes {
+            excludes += listOf("generated.*")
+        }
+    }
 }
