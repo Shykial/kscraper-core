@@ -6,7 +6,6 @@ import com.shykial.kScraperCore.helper.RestTest
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
-import com.shykial.kScraperCore.helper.resource.ResponseMapping
 import com.shykial.kScraperCore.helper.resource.SupportedDomain
 import com.shykial.kScraperCore.helper.respond
 import com.shykial.kScraperCore.helper.saveIn
@@ -18,6 +17,7 @@ import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.starter.MockServerStarter
 import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerClient
+import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerUrl
 import com.shykial.kScraperCore.starter.MongoDBStarter
 import generated.com.shykial.kScraperCore.models.ScrapedDataResponse
 import io.kotest.matchers.shouldBe
@@ -63,7 +63,7 @@ class ScrapingEndpointTest(
         val extractingDetails = domain.extractingDetails(domainRequestDetails.id).saveIn(extractingDetailsRepository)
         val responseMapping = domain.responseMappings[0]
         val resourceUrl = "https://euro.com.pl/mocked-product.html"
-        mockHttpResponse(resourceUrl = resourceUrl, headers = domain.headers, responseMapping = responseMapping)
+        mockHttpResponse(resourceUrl = resourceUrl, headers = domain.headers, body = responseMapping.htmlContent)
 
         Given {
             queryParam("url", resourceUrl)
@@ -82,12 +82,12 @@ class ScrapingEndpointTest(
     private fun mockHttpResponse(
         resourceUrl: String,
         headers: Map<String, String>,
-        responseMapping: ResponseMapping
+        body: String
     ) {
         val resourceSubUrl = resourceUrl.substringAfter("//")
         httpCallMocker.mockHttpRequestCallUrl(
             originalUrl = resourceUrl,
-            mockedUrl = "${MockServerStarter.mockServerUrl}/$resourceSubUrl"
+            mockedUrl = "$mockServerUrl/$resourceSubUrl"
         )
 
         toRequest {
@@ -96,7 +96,7 @@ class ScrapingEndpointTest(
             withHeaders(headers.toMockServerHeaders())
         } respond {
             withStatusCode(200)
-            withBody(responseMapping.htmlContent)
+            withBody(body)
         }
     }
 }
