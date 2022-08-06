@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.endpoint
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
@@ -13,9 +13,8 @@ import com.shykial.kScraperCore.helper.toBase64String
 import com.shykial.kScraperCore.helper.usingTypeComparator
 import com.shykial.kScraperCore.mapper.toEntities
 import com.shykial.kScraperCore.mapper.toExtractingDetailsResponse
-import com.shykial.kScraperCore.model.entity.Attribute
+import com.shykial.kScraperCore.model.entity.ExtractedProperty
 import com.shykial.kScraperCore.model.entity.ExtractingDetails
-import com.shykial.kScraperCore.model.entity.OwnText
 import com.shykial.kScraperCore.model.entity.RegexReplacement
 import com.shykial.kScraperCore.model.entity.Selector
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
@@ -30,8 +29,6 @@ import generated.com.shykial.kScraperCore.models.ExtractingDetailsUpdateRequest
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import io.restassured.module.webtestclient.RestAssuredWebTestClient
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
@@ -47,20 +44,18 @@ import kotlin.random.nextInt
 import generated.com.shykial.kScraperCore.models.RegexReplacement as RegexReplacementInApi
 import generated.com.shykial.kScraperCore.models.Selector as SelectorInApi
 
+private const val EXTRACTING_DETAILS_PATH = "/extracting-details"
+
 @SpringBootTest
-internal class ExtractingDetailsControllerTest(
+internal class ExtractingDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     private val extractingDetailsRepository: ExtractingDetailsRepository
 ) : RestTest(), MongoDBStarter {
 
-    init {
-        RestAssuredWebTestClient.basePath = "/extracting-details"
-    }
-
     @BeforeEach
-    fun setup() {
-        runBlocking { extractingDetailsRepository.deleteAll() }
+    fun setup() = runTest {
+        extractingDetailsRepository.deleteAll()
     }
 
     @Nested
@@ -74,14 +69,14 @@ internal class ExtractingDetailsControllerTest(
             Given {
                 jsonBody(sampleExtractingDetailsRequest)
             } When {
-                post()
+                post(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
                     response.domainId shouldBe request.domainId
                     val entities = extractingDetailsRepository.findByDomainId(request.domainId)
                     response.extractedFieldsDetails shouldContainExactlyInAnyOrder
-                            entities.map { it.toExtractingDetailsResponse() }
+                        entities.map { it.toExtractingDetailsResponse() }
                 }
             }
         }
@@ -96,7 +91,7 @@ internal class ExtractingDetailsControllerTest(
             Given {
                 queryParam("domainId", domainId)
             } When {
-                get()
+                get(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -111,7 +106,7 @@ internal class ExtractingDetailsControllerTest(
                 .saveIn(extractingDetailsRepository)
 
             When {
-                get("/${entity.id}")
+                get("$EXTRACTING_DETAILS_PATH/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<ExtractingDetailsResponse> {
@@ -131,7 +126,7 @@ internal class ExtractingDetailsControllerTest(
                 queryParam("domainId", domainId)
                 queryParam("fieldNames", randomEntities.map { it.fieldName })
             } When {
-                get()
+                get(EXTRACTING_DETAILS_PATH)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -147,7 +142,7 @@ internal class ExtractingDetailsControllerTest(
                 domainId = "sampleDomainId",
                 fieldName = "sampleFieldName",
                 selector = Selector(value = "sampleSelector", index = 0),
-                extractedProperty = OwnText,
+                extractedProperty = ExtractedProperty.OwnText,
                 regexReplacements = mutableListOf(
                     RegexReplacement(initialRegexString.toRegex(), "replacement")
                 )
@@ -166,7 +161,7 @@ internal class ExtractingDetailsControllerTest(
             Given {
                 jsonBody(updateRequest)
             } When {
-                put("/${initialExtractingDetails.id}")
+                put("$EXTRACTING_DETAILS_PATH/${initialExtractingDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
@@ -174,7 +169,7 @@ internal class ExtractingDetailsControllerTest(
                     fieldName shouldBe updateRequest.fieldName
                     selector.index shouldBe updateRequest.selector.index
                     selector.value shouldBe updateRequest.selector.value
-                    extractedProperty shouldBe Attribute(updateRequest.extractedPropertyValue!!)
+                    extractedProperty shouldBe ExtractedProperty.Attribute(updateRequest.extractedPropertyValue!!)
                     assertThat(regexReplacements)
                         .usingTypeComparator(regexComparator)
                         .isEqualTo(updateRequest.regexReplacements?.toListInEntity())
@@ -193,6 +188,7 @@ private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(
             selector = SelectorInApi(value = randomAlphabetic(4), index = Random.nextInt(2)),
             extractedPropertyType = extractedPropertyType,
             extractedPropertyValue = randomAlphabetic(10).takeIf { extractedPropertyType == ATTRIBUTE },
+            regexFilter = sampleRegexString().toBase64String(),
             regexReplacements = List(Random.nextInt(0..5)) {
                 RegexReplacementInApi(sampleRegexString().toBase64String(), randomAlphabetic(10))
             }
@@ -207,5 +203,8 @@ private val regexComparator = Comparator<RegexReplacement> { first, second ->
 private fun sampleRegexString() = """\w+(${randomAlphanumeric(5)}){3,}(?<=${randomAlphanumeric(4)})"""
 
 private fun List<RegexReplacementInApi>.toListInEntity() = map {
-    RegexReplacement(decodeBase64(it.base64EncodedRegex).toRegex(), it.replacement)
+    RegexReplacement(
+        regex = it.base64EncodedRegex.decodeBase64().toRegex(),
+        replacement = it.replacement
+    )
 }

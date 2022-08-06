@@ -1,0 +1,14 @@
+[
+  {
+    "htmlFile": "html-responses/euro-rtv/euro-rtv-discount-1.html",
+    "expectedFieldValue": "1799.00"
+  },
+  {
+    "htmlFile": "html-responses/euro-rtv/euro-rtv-discount-2.html",
+    "expectedFieldValue": "1699.00"
+  },
+  {
+    "htmlFile": "html-responses/euro-rtv/euro-rtv-standard-1.html",
+    "expectedFieldValue": "349.00"
+  }
+]

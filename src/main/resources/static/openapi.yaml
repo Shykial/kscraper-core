@@ -12,6 +12,9 @@ tags:
     description: Operations related to extracting details
   - name: Domain Request Details
     description: Operations related to domain request details
+  - name: Scraping
+    description: Operations related to scraping websites data
+
 paths:
   /auth/login:
     post:
@@ -201,6 +204,7 @@ paths:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         404:
           $ref: '#/components/responses/NotFound'
+
     post:
       tags:
         - Domain Request Details
@@ -220,6 +224,40 @@ paths:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         400:
           $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /scrape:
+    get:
+      tags:
+        - Scraping
+      operationId: scrapeResource
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: scraped resource exact url
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          description: extracting details field names for scraping. Will use all registered for domain if not specified
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScrapedDataResponse'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
 
 components:
   schemas:
@@ -318,6 +356,9 @@ components:
           $ref: '#/components/schemas/ExtractedPropertyType'
         extractedPropertyValue:
           type: string
+        regexFilter:
+          type: string
+          description: base64 encoded regex filter
         regexReplacements:
           type: array
           items:
@@ -344,6 +385,7 @@ components:
       enum:
         - TEXT
         - OWN_TEXT
+        - HTML
         - ATTRIBUTE
 
     DomainRequestDetailsRequest:
@@ -370,6 +412,23 @@ components:
       required:
         - id
 
+    ScrapedDataResponse:
+      type: object
+      properties:
+        url:
+          type: string
+        scrapedFields:
+          type: object
+          additionalProperties:
+            type: string
+        scrapingTimestamp:
+          type: string
+          format: date-time
+      required:
+        - url
+        - scrapedFields
+        - scrapingTimestamp
+
     RegexReplacement:
       type: object
       properties:
@@ -391,6 +450,7 @@ components:
       required:
         - errorType
         - errorMessage
+
     ErrorType:
       type: string
       enum:

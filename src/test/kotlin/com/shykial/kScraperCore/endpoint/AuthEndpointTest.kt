@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.controller
+package com.shykial.kScraperCore.endpoint
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -8,9 +8,9 @@ import com.shykial.kScraperCore.helper.RestTest
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
+import com.shykial.kScraperCore.helper.plusMinutes
 import com.shykial.kScraperCore.helper.saveIn
-import com.shykial.kScraperCore.helpers.plusMinutes
-import com.shykial.kScraperCore.helpers.shouldBeWithin
+import com.shykial.kScraperCore.helper.shouldBeWithin
 import com.shykial.kScraperCore.model.entity.ApplicationUser
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.repository.ApplicationUserRepository
@@ -25,9 +25,7 @@ import generated.com.shykial.kScraperCore.models.RegisterUserRequest
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import io.restassured.module.webtestclient.RestAssuredWebTestClient
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -42,7 +40,7 @@ import java.time.Instant
 private const val AUTH_ENDPOINT = "/auth"
 
 @SpringBootTest
-internal class AuthControllerTest(
+internal class AuthEndpointTest(
     override val objectMapper: ObjectMapper,
     override val webTestClient: WebTestClient,
     private val applicationUserRepository: ApplicationUserRepository,
@@ -50,13 +48,9 @@ internal class AuthControllerTest(
     private val jwtProperties: JwtProperties
 ) : RestTest(), MongoDBStarter {
 
-    init {
-        RestAssuredWebTestClient.basePath = AUTH_ENDPOINT
-    }
-
     @BeforeEach
-    fun setup() {
-        runBlocking { applicationUserRepository.deleteAll() }
+    fun setup() = runTest {
+        applicationUserRepository.deleteAll()
     }
 
     @Nested
@@ -69,7 +63,7 @@ internal class AuthControllerTest(
             Given {
                 jsonBody(loginRequest)
             } When {
-                post("/login")
+                post("$AUTH_ENDPOINT/login")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<AuthToken> {
@@ -90,7 +84,7 @@ internal class AuthControllerTest(
             Given {
                 jsonBody(request)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<IdResponse> { response ->
@@ -110,7 +104,7 @@ internal class AuthControllerTest(
             Given {
                 jsonBody(invalidLoginRequest)
             } When {
-                post("/login")
+                post("$AUTH_ENDPOINT/login")
             } Then {
                 status(HttpStatus.UNAUTHORIZED)
                 extractingBody<ErrorResponse> {
@@ -130,7 +124,7 @@ internal class AuthControllerTest(
             Given {
                 jsonBody(invalidRequest)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.BAD_REQUEST)
                 applicationUserRepository.findAll().toList().shouldBeEmpty()
@@ -153,13 +147,12 @@ internal class AuthControllerTest(
             Given {
                 jsonBody(request)
             } When {
-                post("/register")
+                post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.CONFLICT)
                 applicationUserRepository.findByLogin(existingUser.login) shouldBe existingUser
             }
         }
-
     }
 
     private fun ApplicationUser.assertProperUserPersisted(

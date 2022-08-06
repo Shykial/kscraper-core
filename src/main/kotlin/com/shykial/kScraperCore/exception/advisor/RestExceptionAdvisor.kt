@@ -43,15 +43,15 @@ class RestExceptionAdvisor {
     fun handleAuthorizationException(ex: AuthenticationException) = ex.toErrorResponse(ErrorType.AUTHORIZATION_FAILURE)
 
     @ExceptionHandler
-    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException) : ResponseEntity<Unit> {
-
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<Unit> {
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
     private fun BaseAppException.toErrorResponse(errorType: ErrorType): ResponseEntity<ErrorResponse> {
         log.warn("handling exception with message: $message")
         return ErrorResponse(
-            errorType = errorType, errorMessage = message
+            errorType = errorType,
+            errorMessage = message
         ).toResponseEntity(httpStatus)
     }
 }

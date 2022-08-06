@@ -3,13 +3,10 @@ package com.shykial.kScraperCore.mapper
 import com.shykial.kScraperCore.exception.InvalidInputException
 import com.shykial.kScraperCore.helper.decodeBase64
 import com.shykial.kScraperCore.helper.toBase64String
-import com.shykial.kScraperCore.model.entity.Attribute
 import com.shykial.kScraperCore.model.entity.ExtractedProperty
 import com.shykial.kScraperCore.model.entity.ExtractingDetails
-import com.shykial.kScraperCore.model.entity.OwnText
 import com.shykial.kScraperCore.model.entity.RegexReplacement
 import com.shykial.kScraperCore.model.entity.Selector
-import com.shykial.kScraperCore.model.entity.Text
 import generated.com.shykial.kScraperCore.models.AddExtractingDetailsResponse
 import generated.com.shykial.kScraperCore.models.ExtractedPropertyType
 import generated.com.shykial.kScraperCore.models.ExtractingDetailsRequest
@@ -24,6 +21,7 @@ fun ExtractingDetailsRequest.toEntities() = extractedFieldsDetails.map {
         fieldName = it.fieldName,
         selector = it.selector.toEntityModel(),
         extractedProperty = extractedPropertyFrom(it.extractedPropertyType, it.extractedPropertyValue),
+        regexFilter = it.regexFilter?.decodeBase64()?.toRegex(),
         regexReplacements = it.regexReplacements?.map { rr -> rr.toEntityModel() }?.toMutableList()
     )
 }
@@ -36,6 +34,7 @@ fun ExtractingDetails.toExtractingDetailsResponse(): ExtractingDetailsResponse {
         selector = SelectorInApi(value = selector.value, index = selector.index),
         extractedPropertyType = extractedPropertyType,
         extractedPropertyValue = extractedPropertyValue,
+        regexFilter = regexFilter?.pattern?.toBase64String(),
         regexReplacements = regexReplacements?.map { it.toApiModel() }
     )
 }
@@ -56,7 +55,7 @@ fun ExtractingDetails.updateWith(request: ExtractingDetailsUpdateRequest) = appl
 }
 
 private fun RegexReplacementInApi.toEntityModel() = RegexReplacement(
-    regex = decodeBase64(base64EncodedRegex).toRegex(),
+    regex = base64EncodedRegex.decodeBase64().toRegex(),
     replacement = replacement
 )
 
@@ -67,9 +66,10 @@ private fun RegexReplacement.toApiModel() = RegexReplacementInApi(
 
 private fun ExtractedProperty.toResponsePair() =
     when (this) {
-        is Attribute -> ExtractedPropertyType.ATTRIBUTE to attributeName
-        is OwnText -> ExtractedPropertyType.OWN_TEXT to null
-        is Text -> ExtractedPropertyType.TEXT to null
+        is ExtractedProperty.Attribute -> ExtractedPropertyType.ATTRIBUTE to attributeName
+        is ExtractedProperty.OwnText -> ExtractedPropertyType.OWN_TEXT to null
+        is ExtractedProperty.Text -> ExtractedPropertyType.TEXT to null
+        is ExtractedProperty.Html -> ExtractedPropertyType.HTML to null
     }
 
 private fun SelectorInApi.toEntityModel() = Selector(
@@ -77,12 +77,15 @@ private fun SelectorInApi.toEntityModel() = Selector(
     index = index
 )
 
-private fun extractedPropertyFrom(extractedPropertyType: ExtractedPropertyType, extractedPropertyValue: String?) =
-    when (extractedPropertyType) {
-        ExtractedPropertyType.TEXT -> Text
-        ExtractedPropertyType.OWN_TEXT -> OwnText
-        ExtractedPropertyType.ATTRIBUTE -> Attribute(
-            extractedPropertyValue
-                ?: throw InvalidInputException("No value property value provided for Attribute property type")
-        )
-    }
+private fun extractedPropertyFrom(
+    extractedPropertyType: ExtractedPropertyType,
+    extractedPropertyValue: String?
+) = when (extractedPropertyType) {
+    ExtractedPropertyType.TEXT -> ExtractedProperty.Text
+    ExtractedPropertyType.OWN_TEXT -> ExtractedProperty.OwnText
+    ExtractedPropertyType.HTML -> ExtractedProperty.Html
+    ExtractedPropertyType.ATTRIBUTE -> ExtractedProperty.Attribute(
+        extractedPropertyValue
+            ?: throw InvalidInputException("No value property value provided for Attribute property type")
+    )
+}

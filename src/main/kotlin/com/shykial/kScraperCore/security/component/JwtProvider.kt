@@ -11,7 +11,8 @@ import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.security.JwtProperties
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 @Component
 class JwtProvider(

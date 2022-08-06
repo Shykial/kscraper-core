@@ -17,3 +17,4 @@ security:
 logging:
   level:
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: INFO
+    com.shykial.kScraperCore.staticImplementation: DEBUG
