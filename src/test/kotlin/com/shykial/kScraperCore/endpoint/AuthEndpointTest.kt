@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
+import com.shykial.kScraperCore.helper.KScraperRestTest
 import com.shykial.kScraperCore.helper.RestTest
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
@@ -30,7 +31,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -39,14 +39,14 @@ import java.time.Instant
 
 private const val AUTH_ENDPOINT = "/auth"
 
-@SpringBootTest
+@KScraperRestTest
 internal class AuthEndpointTest(
     override val objectMapper: ObjectMapper,
     override val webTestClient: WebTestClient,
     private val applicationUserRepository: ApplicationUserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProperties: JwtProperties
-) : RestTest(), MongoDBStarter {
+) : RestTest, MongoDBStarter {
 
     @BeforeEach
     fun setup() = runTest {

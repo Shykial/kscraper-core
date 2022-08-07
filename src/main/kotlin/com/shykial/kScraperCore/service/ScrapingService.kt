@@ -5,7 +5,6 @@ import com.shykial.kScraperCore.model.ScrapedData
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.useCase.ScrapeForDataUseCase
-import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -22,7 +21,7 @@ class ScrapingService(
     suspend fun scrapeUrl(
         resourceUrl: String,
         scrapedFields: List<String>? = null
-    ): ScrapedData = coroutineScope {
+    ): ScrapedData {
         log.info("Scraping url $resourceUrl for fields $scrapedFields")
         val domainName = resourceUrl.readDomainName()
         val domainDetails = domainRequestDetailsRepository.findByDomainName(domainName)
@@ -38,7 +37,7 @@ class ScrapingService(
                 scrapedFields?.let { append(", scraped fields: $it") }
             }
         )
-        scrapeForDataUseCase.scrapeForData(
+        return scrapeForDataUseCase.scrapeForData(
             resourceUrl = resourceUrl,
             domainRequestDetails = domainDetails,
             extractingDetails = extractingDetails

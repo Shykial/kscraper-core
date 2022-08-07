@@ -2,11 +2,13 @@ package com.shykial.kScraperCore.endpoint
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
-import com.shykial.kScraperCore.helper.RestTest
+import com.shykial.kScraperCore.helper.KScraperRestTest
+import com.shykial.kScraperCore.helper.RestTestWithAdminAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
 import com.shykial.kScraperCore.helper.saveIn
+import com.shykial.kScraperCore.init.UsersInitializer
 import com.shykial.kScraperCore.mapper.toEntity
 import com.shykial.kScraperCore.mapper.toResponse
 import com.shykial.kScraperCore.model.entity.DomainRequestDetails
@@ -23,18 +25,18 @@ import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
 private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "/domain-request-details"
 
-@SpringBootTest
+@KScraperRestTest
 internal class DomainRequestDetailsEndpointTest(
+    private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
-    private val domainRequestDetailsRepository: DomainRequestDetailsRepository
-) : RestTest(), MongoDBStarter {
+    override val usersInitializer: UsersInitializer
+) : RestTestWithAdminAuthentication, MongoDBStarter {
 
     @BeforeEach
     fun setup() = runTest {
