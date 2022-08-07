@@ -2,7 +2,9 @@ package com.shykial.kScraperCore.helper
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.init.UsersInitializer
+import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.security.JwtProperties
+import io.restassured.config.HeaderConfig
 import io.restassured.http.ContentType
 import io.restassured.http.Header
 import io.restassured.module.webtestclient.RestAssuredWebTestClient
@@ -40,15 +42,35 @@ interface RestTestWithAdminAuthentication : RestTest {
     @BeforeAll
     fun setupAdminAuthentication() = runTest {
         usersInitializer.assureUsersPresentInDB()
-        RestAssuredWebTestClient.requestSpecification = Given { adminAuthHeader() }
+        RestAssuredWebTestClient.requestSpecification = Given {
+            adminAuthHeader()
+        }.config(
+            RestAssuredWebTestClient.config()
+                .headerConfig(HeaderConfig.headerConfig().overwriteHeadersWithName(HttpHeaders.AUTHORIZATION))
+        )
     }
 
-    private fun WebTestClientRequestSpecification.adminAuthHeader(
+    fun WebTestClientRequestSpecification.adminAuthHeader(
         adminLogin: String? = null
     ): WebTestClientRequestSpecification = header(
         Header(
             HttpHeaders.AUTHORIZATION,
-            usersInitializer.getAdminJwtToken(adminLogin).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
+            usersInitializer.getUserJwtToken(
+                userRole = UserRole.ADMIN,
+                userLogin = adminLogin
+            ).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
+        )
+    )
+
+    fun WebTestClientRequestSpecification.apiUserAuthHeader(
+        userLogin: String? = null
+    ): WebTestClientRequestSpecification = header(
+        Header(
+            HttpHeaders.AUTHORIZATION,
+            usersInitializer.getUserJwtToken(
+                userRole = UserRole.API_USER,
+                userLogin = userLogin
+            ).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
         )
     )
 }

@@ -66,7 +66,9 @@ internal class DomainRequestDetailsEndpointTest(
         fun `should properly retrieve domain request details by ID on GET request`() = runTest {
             val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
 
-            When {
+            Given {
+                apiUserAuthHeader()
+            } When {
                 get("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${entity.id}")
             } Then {
                 status(HttpStatus.OK)

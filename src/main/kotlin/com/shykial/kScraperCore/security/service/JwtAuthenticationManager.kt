@@ -42,7 +42,8 @@ class JwtAuthenticationManager(
                 ?.let { jwtProvider.validateAndDecodeToken(it.token) }
                 ?.takeIf { it.refersToValidUser() }
                 ?.let {
-                    UsernamePasswordAuthenticationToken(it.subject, null, it.roles?.map(::SimpleGrantedAuthority))
+                    val authorities = it.roles?.map { role -> SimpleGrantedAuthority("ROLE_$role") }
+                    UsernamePasswordAuthenticationToken(it.subject, null, authorities)
                 } ?: throw AuthenticationException("Authentication failed for $authentication")
         }.getOrElse {
             log.error(it) { it.message }

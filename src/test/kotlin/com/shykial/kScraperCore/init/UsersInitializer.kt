@@ -34,13 +34,13 @@ class UsersInitializer(
         .also { log.info { "Persisting users $it" } }
         .saveAllIn(applicationUserRepository)
 
-    fun getAdminJwtToken(adminLogin: String? = null): JwtToken = groupedUsers[UserRole.ADMIN]
-        ?.let { admins ->
-            adminLogin?.let { login -> admins.single { it.login == login } } ?: admins[0]
+    fun getUserJwtToken(userRole: UserRole, userLogin: String? = null): JwtToken = groupedUsers[userRole]
+        ?.let { users ->
+            userLogin?.let { login -> users.single { it.login == login } } ?: users[0]
         }?.run {
             jwtProvider.createToken(
                 subject = login,
                 roles = listOf(role)
             )
-        } ?: error("Admin user not initialized properly")
+        } ?: error("User with role $userRole ${userLogin?.let { "and login $it" }} not initialized properly")
 }
