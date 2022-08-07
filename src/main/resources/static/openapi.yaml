@@ -451,6 +451,29 @@ components:
         - errorType
         - errorMessage
 
+    InvalidInputErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+      properties:
+        rejectedFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/RejectedField'
+      required:
+        - rejectedFields
+
+    RejectedField:
+      type: object
+      properties:
+        fieldName:
+          type: string
+        rejectedValue:
+          $ref: '#/components/schemas/AnyType'
+      required:
+        - fieldName
+
+    AnyType: { }
+
     ErrorType:
       type: string
       enum:

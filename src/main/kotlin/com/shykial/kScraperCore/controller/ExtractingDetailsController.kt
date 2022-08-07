@@ -1,8 +1,8 @@
 package com.shykial.kScraperCore.controller
 
 import com.shykial.kScraperCore.extension.runSuspend
+import com.shykial.kScraperCore.helper.RestScope
 import com.shykial.kScraperCore.helper.iterableFlow
-import com.shykial.kScraperCore.helper.toResponseEntity
 import com.shykial.kScraperCore.mapper.toExtractingDetailsResponse
 import com.shykial.kScraperCore.mapper.toResponse
 import com.shykial.kScraperCore.service.ExtractingDetailsService
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class ExtractingDetailsController(
     private val extractingDetailsService: ExtractingDetailsService
-) : ExtractingDetailsApi {
+) : ExtractingDetailsApi, RestScope {
     private val log = KotlinLogging.logger { }
 
     override suspend fun findExtractingDetailsById(id: String): ResponseEntity<ExtractingDetailsResponse> {

@@ -1,7 +1,7 @@
 package com.shykial.kScraperCore.controller
 
 import com.shykial.kScraperCore.extension.runSuspend
-import com.shykial.kScraperCore.helper.toResponseEntity
+import com.shykial.kScraperCore.helper.RestScope
 import com.shykial.kScraperCore.service.AuthService
 import generated.com.shykial.kScraperCore.apis.AuthApi
 import generated.com.shykial.kScraperCore.models.AuthToken
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AuthController(
     private val authService: AuthService
-) : AuthApi {
+) : AuthApi, RestScope {
     private val log = KotlinLogging.logger { }
 
     override suspend fun login(

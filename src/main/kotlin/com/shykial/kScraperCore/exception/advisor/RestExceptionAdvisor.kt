@@ -5,19 +5,21 @@ import com.shykial.kScraperCore.exception.AuthorizationException
 import com.shykial.kScraperCore.exception.BaseAppException
 import com.shykial.kScraperCore.exception.DuplicateDataException
 import com.shykial.kScraperCore.exception.NotFoundException
-import com.shykial.kScraperCore.helper.toResponseEntity
+import com.shykial.kScraperCore.helper.RestScope
 import generated.com.shykial.kScraperCore.models.ErrorResponse
 import generated.com.shykial.kScraperCore.models.ErrorType
+import generated.com.shykial.kScraperCore.models.InvalidInputErrorResponse
+import generated.com.shykial.kScraperCore.models.RejectedField
 import mu.KotlinLogging
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.MethodArgumentNotValidException
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.support.WebExchangeBindException
 
-@ControllerAdvice
-class RestExceptionAdvisor {
+@RestControllerAdvice
+class RestExceptionAdvisor : RestScope {
     private val log = KotlinLogging.logger { }
 
     @ExceptionHandler
@@ -43,9 +45,15 @@ class RestExceptionAdvisor {
     fun handleAuthorizationException(ex: AuthenticationException) = ex.toErrorResponse(ErrorType.AUTHORIZATION_FAILURE)
 
     @ExceptionHandler
-    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<Unit> {
-        return ResponseEntity(HttpStatus.BAD_REQUEST)
-    }
+    fun handleMethodArgumentNotValidException(ex: WebExchangeBindException) = ex
+        .also { log.warn { "handling validation exception ${ex.message}" } }
+        .run {
+            InvalidInputErrorResponse(
+                errorType = ErrorType.INVALID_INPUT,
+                errorMessage = "Request payload validation failed",
+                rejectedFields = fieldErrors.map { RejectedField(it.field, it.rejectedValue) }
+            )
+        }.toResponseEntity(HttpStatus.BAD_REQUEST)
 
     private fun BaseAppException.toErrorResponse(errorType: ErrorType): ResponseEntity<ErrorResponse> {
         log.warn("handling exception with message: $message")

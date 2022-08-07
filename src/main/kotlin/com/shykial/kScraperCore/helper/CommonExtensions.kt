@@ -6,7 +6,9 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
-fun <T> T.toResponseEntity(status: HttpStatus = HttpStatus.OK): ResponseEntity<T> = ResponseEntity(this, status)
+interface RestScope {
+    fun <T> T.toResponseEntity(status: HttpStatus = HttpStatus.OK): ResponseEntity<T> = ResponseEntity(this, status)
+}
 
 suspend fun <T : BaseDocument> T.saveIn(
     repository: CoroutineCrudRepository<T, *>

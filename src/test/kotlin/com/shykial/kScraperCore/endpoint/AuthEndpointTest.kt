@@ -21,10 +21,13 @@ import generated.com.shykial.kScraperCore.models.AuthToken
 import generated.com.shykial.kScraperCore.models.ErrorResponse
 import generated.com.shykial.kScraperCore.models.ErrorType
 import generated.com.shykial.kScraperCore.models.IdResponse
+import generated.com.shykial.kScraperCore.models.InvalidInputErrorResponse
 import generated.com.shykial.kScraperCore.models.LoginRequest
 import generated.com.shykial.kScraperCore.models.RegisterUserRequest
+import generated.com.shykial.kScraperCore.models.RejectedField
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -118,7 +121,7 @@ internal class AuthEndpointTest(
             val invalidRequest = RegisterUserRequest(
                 login = "validLogin",
                 email = "invalidEmail",
-                password = "validPassword123*"
+                password = "invalid_password"
             )
 
             Given {
@@ -127,6 +130,13 @@ internal class AuthEndpointTest(
                 post("$AUTH_ENDPOINT/register")
             } Then {
                 status(HttpStatus.BAD_REQUEST)
+                extractingBody<InvalidInputErrorResponse> {
+                    it.errorType shouldBe ErrorType.INVALID_INPUT
+                    it.rejectedFields shouldContainExactlyInAnyOrder listOf(
+                        RejectedField(fieldName = "email", rejectedValue = invalidRequest.email),
+                        RejectedField(fieldName = "password", rejectedValue = invalidRequest.password)
+                    )
+                }
                 applicationUserRepository.findAll().toList().shouldBeEmpty()
             }
         }

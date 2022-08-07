@@ -1,7 +1,7 @@
 package com.shykial.kScraperCore.controller
 
 import com.shykial.kScraperCore.extension.runSuspend
-import com.shykial.kScraperCore.helper.toResponseEntity
+import com.shykial.kScraperCore.helper.RestScope
 import com.shykial.kScraperCore.mapper.toResponse
 import com.shykial.kScraperCore.service.DomainRequestDetailsService
 import generated.com.shykial.kScraperCore.apis.DomainRequestDetailsApi
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class DomainRequestDetailsController(
-    private val domainRequestDetailsService: DomainRequestDetailsService,
-) : DomainRequestDetailsApi {
+    private val domainRequestDetailsService: DomainRequestDetailsService
+) : DomainRequestDetailsApi, RestScope {
     private val log = KotlinLogging.logger { }
 
     override suspend fun findDomainRequestDetailsById(id: String): ResponseEntity<DomainRequestDetailsResponse> {
@@ -29,7 +29,7 @@ class DomainRequestDetailsController(
     }
 
     override suspend fun addDomainRequestDetails(
-        domainRequestDetailsRequest: DomainRequestDetailsRequest,
+        domainRequestDetailsRequest: DomainRequestDetailsRequest
     ): ResponseEntity<DomainRequestDetailsResponse> = domainRequestDetailsRequest
         .also { log.info("Received addDomainRequestDetails request for domain: ${domainRequestDetailsRequest.domainName}") }
         .runSuspend(domainRequestDetailsService::addDomainRequestDetails)
