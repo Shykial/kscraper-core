@@ -8,5 +8,5 @@ data class DomainRequestDetails(
     @Indexed(unique = true)
     var domainName: String,
     var requestHeaders: Map<String, String>? = null,
-    var requestTimeoutInMillis: Int? = null,
+    var requestTimeoutInMillis: Int? = null
 ) : BaseDocument()

@@ -19,5 +19,5 @@ data class ApplicationUser(
 ) : BaseDocument()
 
 enum class UserRole {
-    API_USER, DEV, ADMIN
+    SYSTEM, API_USER, DEV, ADMIN
 }
