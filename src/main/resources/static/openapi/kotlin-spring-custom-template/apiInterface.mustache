@@ -46,9 +46,6 @@ import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 {{/useBeanValidation}}
 
-{{#reactive}}
-import kotlinx.coroutines.flow.Flow
-{{/reactive}}
 import kotlin.collections.List
 import kotlin.collections.Map
 
@@ -96,7 +93,7 @@ interface {{classname}} {
             produces = [{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}]{{/hasProduces}}{{#hasConsumes}},
             consumes = [{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}]{{/hasConsumes}}{{/singleContentTypes}}
     )
-    {{#reactive}}{{^isArray}}suspend {{/isArray}}{{/reactive}}fun {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}}): ResponseEntity<{{>returnTypes}}> {
+    {{#reactive}}suspend {{/reactive}}fun {{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{^-last}},{{/-last}}{{/allParams}}): ResponseEntity<{{>returnTypes}}> {
         {{^isDelegate}}
         return {{>returnValue}}
         {{/isDelegate}}
