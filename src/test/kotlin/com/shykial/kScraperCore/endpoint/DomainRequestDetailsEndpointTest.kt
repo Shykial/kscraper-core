@@ -21,6 +21,7 @@ import generated.com.shykial.kScraperCore.models.ErrorType
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
+import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -48,7 +49,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should properly retrieve domain request details by domain name on GET request`() = runTest {
-            val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
+            val entity = getSampleDomainRequestDetails().saveIn(domainRequestDetailsRepository)
 
             Given {
                 queryParam("domainName", entity.domainName)
@@ -64,7 +65,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should properly retrieve domain request details by ID on GET request`() = runTest {
-            val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
+            val entity = getSampleDomainRequestDetails().saveIn(domainRequestDetailsRepository)
 
             When {
                 get("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${entity.id}")
@@ -78,7 +79,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should add new domain request detail on POST request`() = runTest {
-            val request = sampleDomainRequestDetailsRequest
+            val request = getSampleDomainRequestDetailsRequest()
             domainRequestDetailsRepository.findByDomainName(request.domainName).shouldBeNull()
 
             Given {
@@ -96,7 +97,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should properly update domain request details on PUT request`() = runTest {
-            val initialDomainRequestDetails = sampleDomainRequestDetails
+            val initialDomainRequestDetails = getSampleDomainRequestDetails()
                 .saveIn(domainRequestDetailsRepository)
             val updateRequest = DomainRequestDetailsRequest(
                 domainName = initialDomainRequestDetails.domainName,
@@ -140,7 +141,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should return CONFLICT error response when trying to add duplicate domain request details`() = runTest {
-            val request = sampleDomainRequestDetailsRequest
+            val request = getSampleDomainRequestDetailsRequest()
             domainRequestDetailsRepository.save(request.toEntity())
 
             Given {
@@ -154,7 +155,7 @@ internal class DomainRequestDetailsEndpointTest(
 
         @Test
         fun `should return 403 FORBIDDEN when trying to add domain request details with forbidden role`() = runTest {
-            val request = sampleDomainRequestDetailsRequest
+            val request = getSampleDomainRequestDetailsRequest()
 
             Given {
                 apiUserAuthHeader()
@@ -168,8 +169,8 @@ internal class DomainRequestDetailsEndpointTest(
     }
 }
 
-private val sampleDomainRequestDetailsRequest = DomainRequestDetailsRequest(
-    domainName = "testDomain1.com",
+private fun getSampleDomainRequestDetailsRequest() = DomainRequestDetailsRequest(
+    domainName = "testDomain${randomAlphabetic(5)}1.com",
     requestHeaders = mapOf(
         "firstHeader" to "firstHeaderValue",
         "secondHeader" to "secondHeaderValue"
@@ -177,8 +178,8 @@ private val sampleDomainRequestDetailsRequest = DomainRequestDetailsRequest(
     requestTimeoutInMillis = 1500
 )
 
-private val sampleDomainRequestDetails = DomainRequestDetails(
-    domainName = "testDomain2.com",
+private fun getSampleDomainRequestDetails() = DomainRequestDetails(
+    domainName = "testDomain${randomAlphabetic(5)}2.com",
     requestHeaders = mapOf(
         "firstHeader2" to "firstHeaderValue2",
         "secondHeader2" to "secondHeaderValue2"
