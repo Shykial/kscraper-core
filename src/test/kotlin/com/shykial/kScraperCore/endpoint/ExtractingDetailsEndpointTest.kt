@@ -179,6 +179,22 @@ internal class ExtractingDetailsEndpointTest(
             }
         }
     }
+
+    @Nested
+    inner class NegativeOutcome {
+        @Test
+        fun `should return 403 FORBIDDEN when trying to retrieve extracting details with forbidden role`() = runTest {
+            Given {
+                apiUserAuthHeader()
+                queryParam("domainId", "sampleDomainId")
+                queryParam("fieldNames", "fieldName1,fieldName2")
+            } When {
+                get(EXTRACTING_DETAILS_PATH)
+            } Then {
+                status(HttpStatus.FORBIDDEN)
+            }
+        }
+    }
 }
 
 private val sampleExtractingDetailsRequest = ExtractingDetailsRequest(

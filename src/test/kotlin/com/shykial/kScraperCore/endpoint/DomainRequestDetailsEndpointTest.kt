@@ -66,9 +66,7 @@ internal class DomainRequestDetailsEndpointTest(
         fun `should properly retrieve domain request details by ID on GET request`() = runTest {
             val entity = sampleDomainRequestDetails.saveIn(domainRequestDetailsRepository)
 
-            Given {
-                apiUserAuthHeader()
-            } When {
+            When {
                 get("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
@@ -151,6 +149,20 @@ internal class DomainRequestDetailsEndpointTest(
                 post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
             } Then {
                 status(HttpStatus.CONFLICT)
+            }
+        }
+
+        @Test
+        fun `should return 403 FORBIDDEN when trying to add domain request details with forbidden role`() = runTest {
+            val request = sampleDomainRequestDetailsRequest
+
+            Given {
+                apiUserAuthHeader()
+                jsonBody(request)
+            } When {
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+            } Then {
+                status(HttpStatus.FORBIDDEN)
             }
         }
     }
