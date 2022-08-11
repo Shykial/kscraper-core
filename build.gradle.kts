@@ -11,6 +11,7 @@ val kotestVersion: String by project
 val kotlinLoggingVersion: String by project
 val skrapeItVersion: String by project
 val mockServerClientVersion: String by project
+val jasyptVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -38,6 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.auth0:java-jwt:$javaJwtVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -48,6 +50,7 @@ dependencies {
     implementation("it.skrape:skrapeit:$skrapeItVersion") {
         exclude(group = "ch.qos.logback")
     }
+    implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:$jasyptVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

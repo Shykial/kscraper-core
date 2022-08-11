@@ -418,8 +418,12 @@ components:
         url:
           type: string
         scrapedFields:
-          type: object
+          type: string
           additionalProperties:
+            type: string
+        failedFields:
+          type: array
+          items:
             type: string
         scrapingTimestamp:
           type: string
@@ -428,6 +432,7 @@ components:
         - url
         - scrapedFields
         - scrapingTimestamp
+        - failedFieldsó
 
     RegexReplacement:
       type: object

@@ -14,7 +14,8 @@ private val DOMAIN_PART_FILTER_REGEX = Regex("""http(s)?://|www\.|/.*""")
 class ScrapingService(
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
-    private val scrapeForDataUseCase: ScrapeForDataUseCase
+    private val scrapeForDataUseCase: ScrapeForDataUseCase,
+    private val scrapingFailureDetectionService: ScrapingFailureDetectionService
 ) {
     private val log = KotlinLogging.logger { }
 
@@ -37,11 +38,14 @@ class ScrapingService(
                 scrapedFields?.let { append(", scraped fields: $it") }
             }
         )
-        return scrapeForDataUseCase.scrapeForData(
-            resourceUrl = resourceUrl,
-            domainRequestDetails = domainDetails,
-            extractingDetails = extractingDetails
-        )
+        return scrapingFailureDetectionService.runDetectingScrapingFailures(domainDetails) { attempt ->
+            log.info("Scraping for data for resource $resourceUrl, attempt $attempt")
+            scrapeForDataUseCase.scrapeForData(
+                resourceUrl = resourceUrl,
+                domainRequestDetails = domainDetails,
+                extractingDetails = extractingDetails
+            )
+        }
     }
 }
 

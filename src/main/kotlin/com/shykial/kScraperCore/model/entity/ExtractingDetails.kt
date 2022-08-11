@@ -12,7 +12,9 @@ data class ExtractingDetails(
     var extractedProperty: ExtractedProperty,
     var regexFilter: Regex? = null,
     var regexReplacements: MutableList<RegexReplacement>? = RegexReplacement.DEFAULTS.toMutableList()
-) : BaseDocument()
+) : BaseDocument() {
+    var currentScrapeFailures: Int = 0
+}
 
 sealed interface ExtractedProperty {
     object Text : ExtractedProperty

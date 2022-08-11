@@ -91,6 +91,9 @@ internal class DomainRequestDetailsEndpointTest(
                 extractingBody<DomainRequestDetailsResponse> {
                     val entity = domainRequestDetailsRepository.findByDomainName(request.domainName)
                     it shouldBe entity?.toResponse()
+                    it.domainName shouldBe request.domainName
+                    it.requestHeaders shouldBe request.requestHeaders
+                    it.requestTimeoutInMillis shouldBe request.requestTimeoutInMillis
                 }
             }
         }

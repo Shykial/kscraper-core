@@ -7,12 +7,33 @@ spring:
       authentication-database: admin
       auto-index-creation: true
 
+  mail:
+    host: smtp.office365.com
+    port: 587
+    username: ENC(ngJACEKAvvO5OQ0bW6MaxZmvlfxTiQa8Rx5a2U5Kq1gqONqnGSwQRvcWkyfNmTLNEcjljv63GahpkblLubU1Zg==)
+    password: ENC(SGU2QchRu/RQ/g5sZ29df6OxNmS54WbBO/ddcM8uBTzh0jgUBhazUcAlPe9cCVhR)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+      protocol: smtp
+
 security:
   jwt:
     secret: temp
     validity-in-minutes: 15
     issuer: k-scraper-core
     roles-claim-name: roles
+
+scraping:
+  max-attempts: 3
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+    algorithm: PBEWITHHMACSHA512ANDAES_256
 
 logging:
   level:

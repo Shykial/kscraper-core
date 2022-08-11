@@ -9,4 +9,6 @@ data class DomainRequestDetails(
     var domainName: String,
     var requestHeaders: Map<String, String>? = null,
     var requestTimeoutInMillis: Int? = null
-) : BaseDocument()
+) : BaseDocument() {
+    var currentScrapeFailures: Int = 0
+}
