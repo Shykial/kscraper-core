@@ -16,12 +16,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint
 
+const val ROLE_PREFIX = "ROLE_"
 private const val AUTH_PATHS = "/auth/**"
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @EnableConfigurationProperties(JwtProperties::class)
-class SecurityConfig {
+class SecurityConfiguration {
 
     @Bean
     fun securityFilterChain(
@@ -30,8 +31,7 @@ class SecurityConfig {
     ): SecurityWebFilterChain = http {
         authorizeExchange {
             authorize(AUTH_PATHS, permitAll)
-//            authorize(anyExchange, authenticated)
-            authorize(anyExchange, permitAll)
+            authorize(anyExchange, authenticated)
         }
         addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
         csrf { disable() }

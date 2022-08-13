@@ -3,6 +3,7 @@ package com.shykial.kScraperCore.security.service
 import com.shykial.kScraperCore.exception.AuthenticationException
 import com.shykial.kScraperCore.repository.ApplicationUserRepository
 import com.shykial.kScraperCore.security.JwtProperties
+import com.shykial.kScraperCore.security.ROLE_PREFIX
 import com.shykial.kScraperCore.security.component.DecodedToken
 import com.shykial.kScraperCore.security.component.JwtProvider
 import com.shykial.kScraperCore.security.exception.JwtAuthenticationException
@@ -42,7 +43,8 @@ class JwtAuthenticationManager(
                 ?.let { jwtProvider.validateAndDecodeToken(it.token) }
                 ?.takeIf { it.refersToValidUser() }
                 ?.let {
-                    UsernamePasswordAuthenticationToken(it.subject, null, it.roles?.map(::SimpleGrantedAuthority))
+                    val authorities = it.roles?.map { role -> SimpleGrantedAuthority("$ROLE_PREFIX$role") }
+                    UsernamePasswordAuthenticationToken(it.subject, null, authorities)
                 } ?: throw AuthenticationException("Authentication failed for $authentication")
         }.getOrElse {
             log.error(it) { it.message }

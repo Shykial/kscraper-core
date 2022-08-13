@@ -5,7 +5,6 @@ import com.shykial.kScraperCore.model.ScrapedData
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.useCase.ScrapeForDataUseCase
-import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -15,14 +14,15 @@ private val DOMAIN_PART_FILTER_REGEX = Regex("""http(s)?://|www\.|/.*""")
 class ScrapingService(
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
-    private val scrapeForDataUseCase: ScrapeForDataUseCase
+    private val scrapeForDataUseCase: ScrapeForDataUseCase,
+    private val scrapingFailureDetectionService: ScrapingFailureDetectionService
 ) {
     private val log = KotlinLogging.logger { }
 
     suspend fun scrapeUrl(
         resourceUrl: String,
         scrapedFields: List<String>? = null
-    ): ScrapedData = coroutineScope {
+    ): ScrapedData {
         log.info("Scraping url $resourceUrl for fields $scrapedFields")
         val domainName = resourceUrl.readDomainName()
         val domainDetails = domainRequestDetailsRepository.findByDomainName(domainName)
@@ -38,11 +38,14 @@ class ScrapingService(
                 scrapedFields?.let { append(", scraped fields: $it") }
             }
         )
-        scrapeForDataUseCase.scrapeForData(
-            resourceUrl = resourceUrl,
-            domainRequestDetails = domainDetails,
-            extractingDetails = extractingDetails
-        )
+        return scrapingFailureDetectionService.runDetectingScrapingFailures(domainDetails) { attempt ->
+            log.info("Scraping for data for resource $resourceUrl, attempt $attempt")
+            scrapeForDataUseCase.scrapeForData(
+                resourceUrl = resourceUrl,
+                domainRequestDetails = domainDetails,
+                extractingDetails = extractingDetails
+            )
+        }
     }
 }
 

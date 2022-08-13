@@ -6,6 +6,7 @@ import java.time.ZoneOffset
 
 fun ScrapedData.toResponse() = ScrapedDataResponse(
     url = url,
-    scrapedFields = scrapedFields,
+    scrapedFields = scrapedFields.mapKeys { it.key.fieldName },
+    failedFields = failedDetails.map { it.fieldName },
     scrapingTimestamp = timestamp.atOffset(ZoneOffset.UTC)
 )

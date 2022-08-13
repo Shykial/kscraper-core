@@ -38,12 +38,28 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
                     " after ${System.currentTimeMillis() - startMillis} ms"
             }
             htmlDocument {
-                ScrapedData(
-                    url = resourceUrl,
-                    scrapedFields = extractingDetails.associate { extractDetails(it) }
-                ).also { log.info("finished scraping with result: ${it.scrapedFields}") }
+                processHtmlDocument(extractingDetails, resourceUrl)
             }
         }
+    }
+
+    private fun Doc.processHtmlDocument(
+        extractingDetails: List<ExtractingDetails>,
+        resourceUrl: String
+    ): ScrapedData {
+        val properlyExtracted = mutableMapOf<ExtractingDetails, String>()
+        val failedFields = mutableListOf<ExtractingDetails>()
+        extractingDetails
+            .associateWith { extractDetails(it) }
+            .forEach { (details, scrapedValue) ->
+                if (scrapedValue != null) properlyExtracted[details] = scrapedValue
+                else failedFields.add(details)
+            }
+        return ScrapedData(
+            url = resourceUrl,
+            scrapedFields = properlyExtracted,
+            failedDetails = failedFields
+        ).also { log.info("finished scraping with result: ${it.scrapedFields}") }
     }
 
     private fun Request.fillHeaders(customHeaders: Map<String, String>) {
@@ -57,20 +73,19 @@ object SkrapeItDataScraper : ScrapeForDataUseCase {
 
     private fun Doc.extractDetails(
         extractingDetails: ExtractingDetails
-    ): Pair<String, String> = extractingDetails.let { details ->
-        val element = details.selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
+    ): String? = runCatching {
+        val element = extractingDetails.selector.run { if (index == -1) findLast(value) else findByIndex(index, value) }
         val rawText = element.run {
-            when (val extractedProperty = details.extractedProperty) {
+            when (val extractedProperty = extractingDetails.extractedProperty) {
                 is ExtractedProperty.Attribute -> attribute(extractedProperty.attributeName)
                 is ExtractedProperty.OwnText -> ownText
                 is ExtractedProperty.Text -> text
                 is ExtractedProperty.Html -> html
             }
         }
-        val filteredText = details.regexFilter?.find(rawText)?.value ?: rawText
-        val fieldValue = details.regexReplacements
+        val filteredText = extractingDetails.regexFilter?.find(rawText)?.value ?: rawText
+        extractingDetails.regexReplacements
             ?.fold(filteredText) { current, (regex, replacement) -> current.replace(regex, replacement) }
             ?: filteredText
-        details.fieldName to fieldValue
-    }
+    }.getOrNull()
 }

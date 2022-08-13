@@ -45,7 +45,7 @@ internal class SkrapeItDataScraperTest {
             domainRequestDetails = domainRequestDetailsMock,
             extractingDetails = listOf(extractingDetails)
         )
-        scrapedData.scrapedFields shouldContain (extractingDetails.fieldName to responseMapping.expectedFieldValue)
+        scrapedData.scrapedFields shouldContain (extractingDetails to responseMapping.expectedFieldValue)
     }
 
     private fun responseMappingsSource() = enumValues<SupportedDomain>()

@@ -1,0 +1,6 @@
+spring:
+  mail:
+    host: mockedHost
+    port: 8080
+    username: mockedUsername
+    password: mockedPassword
