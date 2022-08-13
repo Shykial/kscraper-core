@@ -7,9 +7,9 @@ import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.time.Duration
 import java.util.UUID
 import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.seconds
 
 @Service
 class EmailService(
@@ -20,19 +20,19 @@ class EmailService(
 
     @Async
     suspend fun sendMail(
-        toEmail: String,
+        toEmails: Collection<String>,
         subject: String,
         content: String,
         isHtmlContent: Boolean
     ) {
-        withRetries(maxAttempts = 5, delay = Duration.ofSeconds(2)) { attempt ->
+        withRetries(maxAttempts = 5, delay = 2.seconds) { attempt ->
             val requestId = UUID.randomUUID()
             measureTimeMillis {
-                log.info("[$requestId] Sending message with subject [$subject] to email [$toEmail], attempt [$attempt]")
+                log.info("[$requestId] Sending message with subject [$subject] to emails [$toEmails], attempt [$attempt]")
                 javaMailSender.createMimeMessage().also {
                     MimeMessageHelper(it).apply {
                         setFrom(fromEmail)
-                        setTo(toEmail)
+                        setTo(toEmails.toTypedArray())
                         setSubject(subject)
                         setText(content, isHtmlContent)
                     }

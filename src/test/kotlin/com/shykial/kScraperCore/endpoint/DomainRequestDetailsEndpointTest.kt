@@ -3,10 +3,11 @@ package com.shykial.kScraperCore.endpoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
-import com.shykial.kScraperCore.helper.RestTestWithAdminAuthentication
+import com.shykial.kScraperCore.helper.RestTestWithAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
+import com.shykial.kScraperCore.helper.findRefreshed
 import com.shykial.kScraperCore.helper.saveIn
 import com.shykial.kScraperCore.init.UsersInitializer
 import com.shykial.kScraperCore.mapper.toEntity
@@ -37,7 +38,7 @@ internal class DomainRequestDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     override val usersInitializer: UsersInitializer
-) : RestTestWithAdminAuthentication, MongoDBStarter {
+) : RestTestWithAuthentication, MongoDBStarter {
 
     @BeforeEach
     fun setup() = runTest {
@@ -115,7 +116,7 @@ internal class DomainRequestDetailsEndpointTest(
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
-                domainRequestDetailsRepository.findById(initialDomainRequestDetails.id)!!.run {
+                domainRequestDetailsRepository.findRefreshed(initialDomainRequestDetails).run {
                     domainName shouldBe updateRequest.domainName
                     requestHeaders shouldBe updateRequest.requestHeaders
                     requestTimeoutInMillis shouldBe updateRequest.requestTimeoutInMillis

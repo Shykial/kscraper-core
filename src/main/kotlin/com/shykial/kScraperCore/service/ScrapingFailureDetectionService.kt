@@ -56,29 +56,31 @@ class ScrapingFailureDetectionService(
 
     private suspend fun ExtractingDetails.notifyIfNeeded() {
         if ((currentScrapeFailures >= 0) && (currentScrapeFailures % scrapingMaxAttempts == 0)) {
-            buildList {
+            val emails = buildSet {
                 addAll(applicationUserRepository.findByRole(UserRole.ADMIN).map { it.email })
                 createdBy?.email?.let { add(it) }
-            }.forEach { sendExtractingDetailsFailureEmail(this, it) }
+            }
+            sendExtractingDetailsFailureEmail(this, emails)
         }
     }
 
     private suspend fun DomainRequestDetails.notifyIfNeeded() {
         if ((currentScrapeFailures >= 0) && (currentScrapeFailures % scrapingMaxAttempts == 0)) {
-            buildList {
+            val emails = buildSet {
                 addAll(applicationUserRepository.findByRole(UserRole.ADMIN).map { it.email })
                 createdBy?.email?.let { add(it) }
-            }.forEach { sendDomainRequestDetailsFailureEmail(this, it) }
+            }
+            sendDomainRequestDetailsFailureEmails(this, emails)
         }
     }
 
     private suspend fun sendExtractingDetailsFailureEmail(
         extractingDetails: ExtractingDetails,
-        toEmail: String
+        toEmails: Set<String>
     ) {
         emailService.sendMail(
-            toEmail = toEmail,
-            subject = "Scraping failure for extracting Details for domain with ID[${extractingDetails.domainId}]",
+            toEmails = toEmails,
+            subject = "Scraping failure for Extracting Details for domain with ID[${extractingDetails.domainId}]",
             content = """<h3>Scraping failed for extractingDetails:</h3>
                          |<p><i>$extractingDetails</i></p>
                          |<h5>failure number [${extractingDetails.currentScrapeFailures}]</h5>
@@ -87,13 +89,13 @@ class ScrapingFailureDetectionService(
         )
     }
 
-    private suspend fun sendDomainRequestDetailsFailureEmail(
+    private suspend fun sendDomainRequestDetailsFailureEmails(
         domainRequestDetails: DomainRequestDetails,
-        toEmail: String
+        toEmails: Set<String>
     ) {
         emailService.sendMail(
-            toEmail = toEmail,
-            subject = "Scraping failure for domain request details for domain [${domainRequestDetails.domainName}]",
+            toEmails = toEmails,
+            subject = "Scraping failure for Domain Request Details for domain [${domainRequestDetails.domainName}]",
             content = """<h3>Scraping failed for domainRequestDetails:</h3>
                          |<p><i>$domainRequestDetails</i></p>
                          |<h5>failure number [${domainRequestDetails.currentScrapeFailures}]</h5>

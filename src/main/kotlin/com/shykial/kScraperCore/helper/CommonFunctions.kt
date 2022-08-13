@@ -1,12 +1,12 @@
 package com.shykial.kScraperCore.helper
 
 import com.shykial.kScraperCore.model.entity.BaseDocument
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.time.delay
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import java.time.Duration
+import kotlin.time.Duration
 
 interface RestScope {
     fun <T> T.toResponseEntity(status: HttpStatus = HttpStatus.OK): ResponseEntity<T> = ResponseEntity(this, status)
@@ -28,7 +28,7 @@ suspend inline fun <T> withRetries(
 ): T {
     repeat(maxAttempts - 1) { attempt ->
         runCatching { block(attempt) }.onSuccess { return it }
-        delay(delay)
+        delay(delay.inWholeMilliseconds)
     }
     return runCatching { block(maxAttempts) }.onFailure(failureCallback).getOrThrow()
 }

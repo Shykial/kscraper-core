@@ -3,11 +3,12 @@ package com.shykial.kScraperCore.endpoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
-import com.shykial.kScraperCore.helper.RestTestWithAdminAuthentication
+import com.shykial.kScraperCore.helper.RestTestWithAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.decodeBase64
 import com.shykial.kScraperCore.helper.extractingBody
+import com.shykial.kScraperCore.helper.findRefreshed
 import com.shykial.kScraperCore.helper.saveAllIn
 import com.shykial.kScraperCore.helper.saveIn
 import com.shykial.kScraperCore.helper.toBase64String
@@ -53,7 +54,7 @@ internal class ExtractingDetailsEndpointTest(
     override val objectMapper: ObjectMapper,
     override val usersInitializer: UsersInitializer,
     private val extractingDetailsRepository: ExtractingDetailsRepository
-) : RestTestWithAdminAuthentication, MongoDBStarter {
+) : RestTestWithAuthentication, MongoDBStarter {
 
     @BeforeEach
     fun setup() = runTest {
@@ -167,7 +168,7 @@ internal class ExtractingDetailsEndpointTest(
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
-                extractingDetailsRepository.findById(initialExtractingDetails.id)!!.run {
+                extractingDetailsRepository.findRefreshed(initialExtractingDetails).run {
                     fieldName shouldBe updateRequest.fieldName
                     selector.index shouldBe updateRequest.selector.index
                     selector.value shouldBe updateRequest.selector.value

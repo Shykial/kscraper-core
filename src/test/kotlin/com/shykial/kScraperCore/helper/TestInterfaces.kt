@@ -36,12 +36,18 @@ interface RestTest {
     private fun Any?.toJsonString(): String = objectMapper.writeValueAsString(this)
 }
 
-interface RestTestWithAdminAuthentication : RestTest {
+interface WithPreInitializedUsers {
     val usersInitializer: UsersInitializer
 
     @BeforeAll
-    fun setupAdminAuthentication() = runTest {
+    fun assureUsersPresentInDB() = runTest {
         usersInitializer.assureUsersPresentInDB()
+    }
+}
+
+interface RestTestWithAuthentication : RestTest, WithPreInitializedUsers {
+    @BeforeAll
+    fun setupAdminAuthentication() = runTest {
         RestAssuredWebTestClient.requestSpecification = Given {
             adminAuthHeader()
         }.config(
