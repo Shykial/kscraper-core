@@ -46,7 +46,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("io.springfox:springfox-boot-starter:$swaggerVersion")
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.10")
+
     implementation("it.skrape:skrapeit:$skrapeItVersion") {
         exclude(group = "ch.qos.logback")
     }
@@ -91,7 +92,7 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
     testLogging {
-        events = setOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
+        events = setOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.STANDARD_OUT)
     }
 }
 

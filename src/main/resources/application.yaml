@@ -6,6 +6,9 @@ spring:
     mongodb:
       authentication-database: admin
       auto-index-creation: true
+      database: kscraper_core_db
+      username: ENC(9TokiMSQs9AZgHVXDWv8We/eISVZaJwEopb+2esXd9NoO5VLy7GUqdOjEbjBACcmjiogWnyK09iaXmeuV5qC5Q==)
+      password: ENC(IQ05sXzIicOx3nznejl1sFmsmJlb+buAz7xkxL11GQK5Efb/TfByFYSdDaWR44ezlgQHCQ9j2eIZmre4Un1XQA==)
 
   mail:
     host: smtp.office365.com
@@ -19,6 +22,10 @@ spring:
           starttls:
             enable: true
       protocol: smtp
+
+springdoc:
+  swagger-ui:
+    url: /openapi/openapi.yaml
 
 security:
   jwt:

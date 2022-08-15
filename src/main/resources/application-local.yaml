@@ -1,6 +1,0 @@
-spring:
-  data:
-    mongodb:
-      username: kscraper_core_root
-      password: kscraper_core_pass
-      database: kscraper_core_db

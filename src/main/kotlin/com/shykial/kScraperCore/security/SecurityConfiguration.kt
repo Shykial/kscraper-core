@@ -18,6 +18,13 @@ import org.springframework.security.web.server.authentication.HttpStatusServerEn
 
 const val ROLE_PREFIX = "ROLE_"
 private const val AUTH_PATHS = "/auth/**"
+private val SWAGGER_PATHS = listOf(
+    "/webjars/swagger-ui/**",
+    "/swagger-ui/**",
+    "/v3/api-docs/**",
+    "/openapi/openapi.yaml",
+    "/swagger-ui.html"
+)
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -31,6 +38,7 @@ class SecurityConfiguration {
     ): SecurityWebFilterChain = http {
         authorizeExchange {
             authorize(AUTH_PATHS, permitAll)
+            SWAGGER_PATHS.forEach { authorize(it, permitAll) }
             authorize(anyExchange, authenticated)
         }
         addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
