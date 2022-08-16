@@ -37,6 +37,8 @@ paths:
                 $ref: '#/components/schemas/AuthToken'
         400:
           description: Bad request
+        401:
+          description: Unauthorized
 
   /auth/register:
     post:
@@ -74,6 +76,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExtractingDetailsResponse'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -94,6 +98,8 @@ paths:
           description: No content
         400:
           $ref: '#/components/responses/BadRequest'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -124,6 +130,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExtractingDetailsResponse'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -146,6 +154,8 @@ paths:
                 $ref: '#/components/schemas/AddExtractingDetailsResponse'
         400:
           $ref: '#/components/responses/BadRequest'
+        401:
+          description: Unauthorized
 
   /domain-request-details/{id}:
     get:
@@ -161,6 +171,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -181,6 +193,8 @@ paths:
           description: No content
         400:
           $ref: '#/components/responses/BadRequest'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -204,6 +218,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -226,6 +242,8 @@ paths:
                 $ref: '#/components/schemas/DomainRequestDetailsResponse'
         400:
           $ref: '#/components/responses/BadRequest'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -258,6 +276,8 @@ paths:
                 $ref: '#/components/schemas/ScrapedDataResponse'
         400:
           $ref: '#/components/responses/BadRequest'
+        401:
+          description: Unauthorized
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -483,12 +503,9 @@ components:
       properties:
         fieldName:
           type: string
-        rejectedValue:
-          $ref: '#/components/schemas/AnyType'
+        rejectedValue: { }
       required:
         - fieldName
-
-    AnyType: { }
 
     ErrorType:
       type: string

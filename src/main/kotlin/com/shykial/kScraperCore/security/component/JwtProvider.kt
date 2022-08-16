@@ -7,11 +7,11 @@ import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.shykial.kScraperCore.exception.AuthorizationException
 import com.shykial.kScraperCore.exception.InvalidInputException
+import com.shykial.kScraperCore.extension.plusMinutes
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.security.JwtProperties
 import org.springframework.stereotype.Component
 import java.time.Instant
-import java.util.Date
 import java.util.UUID
 
 @Component
@@ -25,8 +25,8 @@ class JwtProvider(
         get() = with(jwtProperties) {
             val currentInstant = Instant.now()
             JWT.create()
-                .withIssuedAt(Date.from(currentInstant))
-                .withExpiresAt(Date.from(currentInstant.plusSeconds(validityInMinutes * 60)))
+                .withIssuedAt(currentInstant)
+                .withExpiresAt(currentInstant.plusMinutes(validityInMinutes))
                 .withJWTId(UUID.randomUUID().toString())
                 .withIssuer(issuer)
         }
@@ -54,8 +54,8 @@ class DecodedToken(
 ) {
     val subject: String? = decodedJWT.subject
     val roles: List<String>? = decodedJWT.getClaim(rolesClaimName).asList(String::class.java)
-    val issuedAt: Instant? = decodedJWT.issuedAt?.toInstant()
-    val expiresAt: Instant? = decodedJWT.expiresAt?.toInstant()
+    val issuedAt: Instant? = decodedJWT.issuedAtAsInstant
+    val expiresAt: Instant? = decodedJWT.expiresAtAsInstant
     val allClaims: Map<String, Claim> = decodedJWT.claims
 
     val isExpired: Boolean
