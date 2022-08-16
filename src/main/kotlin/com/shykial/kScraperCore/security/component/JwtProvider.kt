@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.shykial.kScraperCore.exception.AuthorizationException
-import com.shykial.kScraperCore.exception.InvalidInputException
 import com.shykial.kScraperCore.extension.plusMinutes
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.security.JwtProperties
@@ -59,8 +58,7 @@ class DecodedToken(
     val allClaims: Map<String, Claim> = decodedJWT.claims
 
     val isExpired: Boolean
-        get() = expiresAt?.isBefore(Instant.now())
-            ?: throw InvalidInputException("ExpiresAt claim not present in token") // todo replace this exception
+        get() = expiresAt?.isBefore(Instant.now()) ?: false
 }
 
 @JvmInline

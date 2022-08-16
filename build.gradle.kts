@@ -103,7 +103,7 @@ kotlin.sourceSets["main"].kotlin.srcDir("$generatedResourcesDir/src/main/kotlin"
 openApiGenerate {
     inputSpec.set("$rootDir/src/main/resources/static/openapi/openapi.yaml")
     generatorName.set("kotlin-spring")
-    outputDir.set("$buildDir/generated-resources")
+    outputDir.set(generatedResourcesDir)
     packageName.set("generated.com.shykial.kScraperCore")
     templateDir.set("$rootDir/src/main/resources/static/openapi/kotlin-spring-custom-template")
     configOptions.putAll(
