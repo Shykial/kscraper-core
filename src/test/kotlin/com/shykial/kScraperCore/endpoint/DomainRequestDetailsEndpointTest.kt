@@ -3,6 +3,7 @@ package com.shykial.kScraperCore.endpoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
+import com.shykial.kScraperCore.helper.RestTest.Companion.BASE_PATH
 import com.shykial.kScraperCore.helper.RestTestWithAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
-private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "/domain-request-details"
+private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "$BASE_PATH/domain-request-details"
 
 @KScraperRestTest
 internal class DomainRequestDetailsEndpointTest(

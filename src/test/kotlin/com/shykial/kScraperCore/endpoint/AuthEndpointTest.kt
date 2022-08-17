@@ -7,6 +7,7 @@ import com.shykial.kScraperCore.extension.plusMinutes
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
 import com.shykial.kScraperCore.helper.RestTest
+import com.shykial.kScraperCore.helper.RestTest.Companion.BASE_PATH
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
 import com.shykial.kScraperCore.helper.extractingBody
@@ -40,7 +41,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Duration
 import java.time.Instant
 
-private const val AUTH_ENDPOINT = "/auth"
+private const val AUTH_ENDPOINT = "$BASE_PATH/auth"
 
 @KScraperRestTest
 internal class AuthEndpointTest(

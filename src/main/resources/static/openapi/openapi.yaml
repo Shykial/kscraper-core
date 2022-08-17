@@ -4,7 +4,7 @@ info:
   description: Openapi schema for k-scraper-core REST operations
   version: 1.0.0
 servers:
-  - url: 'http://localhost:8080'
+  - url: 'http://localhost:8080/kscraper-core'
 tags:
   - name: Auth
     description: Operations related to authorization and authentication

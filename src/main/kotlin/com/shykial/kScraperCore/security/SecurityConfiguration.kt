@@ -17,7 +17,7 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint
 
 const val ROLE_PREFIX = "ROLE_"
-private const val AUTH_PATHS = "/auth/**"
+private const val AUTH_PATHS = "/kscraper-core/auth/**"
 private val SWAGGER_PATHS = listOf(
     "/webjars/swagger-ui/**",
     "/swagger-ui/**",

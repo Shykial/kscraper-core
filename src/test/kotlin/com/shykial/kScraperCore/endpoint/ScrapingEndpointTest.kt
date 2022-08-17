@@ -3,6 +3,7 @@ package com.shykial.kScraperCore.endpoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
+import com.shykial.kScraperCore.helper.RestTest.Companion.BASE_PATH
 import com.shykial.kScraperCore.helper.RestTestWithAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
@@ -31,7 +32,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
-private const val SCRAPE_PATH = "/scrape"
+private const val SCRAPE_PATH = "$BASE_PATH/scrape"
 
 @KScraperRestTest
 class ScrapingEndpointTest(

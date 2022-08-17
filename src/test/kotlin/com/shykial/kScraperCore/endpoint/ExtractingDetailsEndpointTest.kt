@@ -3,6 +3,7 @@ package com.shykial.kScraperCore.endpoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
+import com.shykial.kScraperCore.helper.RestTest.Companion.BASE_PATH
 import com.shykial.kScraperCore.helper.RestTestWithAuthentication
 import com.shykial.kScraperCore.helper.Then
 import com.shykial.kScraperCore.helper.When
@@ -46,7 +47,7 @@ import kotlin.random.nextInt
 import generated.com.shykial.kScraperCore.models.RegexReplacement as RegexReplacementInApi
 import generated.com.shykial.kScraperCore.models.Selector as SelectorInApi
 
-private const val EXTRACTING_DETAILS_PATH = "/extracting-details"
+private const val EXTRACTING_DETAILS_PATH = "$BASE_PATH/extracting-details"
 
 @KScraperRestTest
 internal class ExtractingDetailsEndpointTest(

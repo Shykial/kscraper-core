@@ -24,6 +24,10 @@ interface RestTest {
     val objectMapper: ObjectMapper
     val webTestClient: WebTestClient
 
+    companion object {
+        const val BASE_PATH = "kscraper-core"
+    }
+
     @BeforeAll
     fun setupRestAssured() {
         RestAssuredWebTestClient.webTestClient(webTestClient)
