@@ -19,4 +19,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "kscraper-core"
+rootProject.name = "kScraper-core"

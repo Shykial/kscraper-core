@@ -12,6 +12,7 @@ val kotlinLoggingVersion: String by project
 val skrapeItVersion: String by project
 val mockServerClientVersion: String by project
 val jasyptVersion: String by project
+val springDocVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -46,7 +47,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.10")
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:$springDocVersion")
 
     implementation("it.skrape:skrapeit:$skrapeItVersion") {
         exclude(group = "ch.qos.logback")
