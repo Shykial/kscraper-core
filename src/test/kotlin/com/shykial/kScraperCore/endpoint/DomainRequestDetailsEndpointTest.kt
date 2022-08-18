@@ -15,7 +15,7 @@ import com.shykial.kScraperCore.mapper.toEntity
 import com.shykial.kScraperCore.mapper.toResponse
 import com.shykial.kScraperCore.model.entity.DomainRequestDetails
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import generated.com.shykial.kScraperCore.models.DomainRequestDetailsRequest
 import generated.com.shykial.kScraperCore.models.DomainRequestDetailsResponse
 import generated.com.shykial.kScraperCore.models.ErrorResponse
@@ -39,7 +39,7 @@ internal class DomainRequestDetailsEndpointTest(
     override val webTestClient: WebTestClient,
     override val objectMapper: ObjectMapper,
     override val usersInitializer: UsersInitializer
-) : RestTestWithAuthentication, MongoDBStarter {
+) : RestTestWithAuthentication, RequiredServicesStarter {
 
     @BeforeEach
     fun setup() = runTest {

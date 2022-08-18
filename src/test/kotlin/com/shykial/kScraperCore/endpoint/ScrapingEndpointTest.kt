@@ -21,7 +21,7 @@ import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.starter.MockServerStarter
 import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerClient
 import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerUrl
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import generated.com.shykial.kScraperCore.models.ScrapedDataResponse
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.launch
@@ -30,13 +30,11 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 
 private const val SCRAPE_PATH = "$BASE_PATH/scrape"
 
 @KScraperRestTest
-@ActiveProfiles("no-rabbitmq")
 class ScrapingEndpointTest(
     override val objectMapper: ObjectMapper,
     override val webTestClient: WebTestClient,
@@ -44,7 +42,7 @@ class ScrapingEndpointTest(
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
     private val httpCallMocker: HttpCallMocker
-) : RestTestWithAuthentication, MongoDBStarter, MockServerStarter {
+) : RestTestWithAuthentication, RequiredServicesStarter, MockServerStarter {
 
     @BeforeEach
     fun setup() = runTest {

@@ -14,7 +14,7 @@ import com.shykial.kScraperCore.model.entity.Selector
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import io.kotest.assertions.timing.continually
 import io.kotest.assertions.timing.eventually
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -44,14 +44,14 @@ import javax.mail.internet.MimeMessage
 import kotlin.time.Duration.Companion.seconds
 
 @SpringBootTest
-@ActiveProfiles("test", "no-rabbitmq")
+@ActiveProfiles("test")
 class ScrapingFailureDetectionTest(
     private val scrapingFailureDetectionService: ScrapingFailureDetectionService,
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
     override val usersInitializer: UsersInitializer,
     @Value("\${scraping.max-attempts}") private val scrapingMaxAttempts: Int
-) : MongoDBStarter, WithPreInitializedUsers {
+) : RequiredServicesStarter, WithPreInitializedUsers {
 
     @MockkBean
     private lateinit var javaMailSender: JavaMailSender

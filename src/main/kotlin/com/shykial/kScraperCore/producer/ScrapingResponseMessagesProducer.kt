@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class ScrapingResponseMessagesProducer(
     private val rabbitTemplate: RabbitTemplate,
     @Value("\${rabbitmq.producer.exchange}") private val producerExchange: String,
-    @Value("\${rabbitmq.producer.queue.scraping-resonse}") private val scrapingResponseQueue: String
+    @Value("\${rabbitmq.producer.queue.scraping-response}") private val scrapingResponseQueue: String
 ) {
     fun publishScrapingResponseMessage(response: ScrapingResponseMessage) {
         rabbitTemplate.convertAndSend(

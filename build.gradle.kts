@@ -68,6 +68,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
     testImplementation("org.testcontainers:mockserver")
+    testImplementation("org.testcontainers:rabbitmq")
     testImplementation("org.mock-server:mockserver-client-java:$mockServerClientVersion")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockKVersion")
