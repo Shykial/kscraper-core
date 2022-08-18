@@ -13,6 +13,12 @@ spring:
       username: ENC(9TokiMSQs9AZgHVXDWv8We/eISVZaJwEopb+2esXd9NoO5VLy7GUqdOjEbjBACcmjiogWnyK09iaXmeuV5qC5Q==)
       password: ENC(IQ05sXzIicOx3nznejl1sFmsmJlb+buAz7xkxL11GQK5Efb/TfByFYSdDaWR44ezlgQHCQ9j2eIZmre4Un1XQA==)
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ENC(VeK88Zofu2W04mWDrVRCt/DzOBG74hgQo0yi8F3n4MPRfR4qQv2qD/0/q2ql99wAK6luzLzkJE0m2I0V4stxLw==)
+    password: ENC(7zl5FcQvwEteA6cqwh5T3Mm0hbD1CzVAotEJDSF8kyeMGV6MNXWENEae7GhcSwFguVjLUap4NYU9r2IRNE+V/w==)
+
   mail:
     host: smtp.office365.com
     port: 587
@@ -32,13 +38,18 @@ springdoc:
 
 security:
   jwt:
-    secret: temp
+    secret: ENC(ArZ3WAm3OIYNaOSHaDZO2dvfwUMApw6urFi75bUPOxJn+qwYsPNKepPzISrS6Ico+bQkCpbM5aPZojovTfQ7JQ==)
     validity-in-minutes: 15
     issuer: k-scraper-core
     roles-claim-name: roles
 
 scraping:
   max-attempts: 3
+
+rabbitmq:
+  exchange: kscraper.core
+  consumer:
+    scraping-requests-queue: "scraping.requests"
 
 jasypt:
   encryptor:

@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.config
+package com.shykial.kScraperCore.configuration
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.databind.SerializationFeature

@@ -30,11 +30,13 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 
 private const val SCRAPE_PATH = "$BASE_PATH/scrape"
 
 @KScraperRestTest
+@ActiveProfiles("no-rabbitmq")
 class ScrapingEndpointTest(
     override val objectMapper: ObjectMapper,
     override val webTestClient: WebTestClient,

@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.config.libraryBugFixes
+package com.shykial.kScraperCore.configuration.libraryBugFixes
 
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.boot.validation.MessageInterpolatorFactory

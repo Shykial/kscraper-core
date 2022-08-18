@@ -33,4 +33,16 @@ class AuthService(
         .let { it.toDocument(passwordEncoder.encode(it.password)) }
         .saveIn(applicationUserRepository)
         .id
+
+//    init {
+//        mono {
+//            ApplicationUser(
+//                login = "kDealFinder",
+//                passwordHash = "kDealFinderPass123*".run(passwordEncoder::encode),
+//                email = "testMail@mail.com",
+//                role = UserRole.API_USER,
+//                isDisabled = false
+//            ).saveIn(applicationUserRepository)
+//        }.subscribe()
+//    }
 }

@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.config.libraryBugFixes
+package com.shykial.kScraperCore.configuration.libraryBugFixes
 
 import org.hibernate.validator.internal.engine.DefaultClockProvider
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer

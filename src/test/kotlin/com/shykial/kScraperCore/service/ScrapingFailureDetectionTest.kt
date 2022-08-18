@@ -1,7 +1,7 @@
 package com.shykial.kScraperCore.service
 
 import com.ninjasquad.springmockk.MockkBean
-import com.shykial.kScraperCore.config.KScraperAuditor
+import com.shykial.kScraperCore.configuration.KScraperAuditor
 import com.shykial.kScraperCore.helper.WithPreInitializedUsers
 import com.shykial.kScraperCore.helper.findRefreshed
 import com.shykial.kScraperCore.helper.saveIn
@@ -44,7 +44,7 @@ import javax.mail.internet.MimeMessage
 import kotlin.time.Duration.Companion.seconds
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("test", "no-rabbitmq")
 class ScrapingFailureDetectionTest(
     private val scrapingFailureDetectionService: ScrapingFailureDetectionService,
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,

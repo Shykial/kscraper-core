@@ -14,10 +14,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest
 @AutoConfigureWebTestClient(timeout = "PT20S")
+@ActiveProfiles("no-rabbitmq")
 annotation class KScraperRestTest
 
 interface RestTest {
