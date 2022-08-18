@@ -2,9 +2,13 @@ package com.shykial.kScraperCore.service
 
 import com.shykial.kScraperCore.exception.NotFoundException
 import com.shykial.kScraperCore.model.ScrapedData
+import com.shykial.kScraperCore.model.ScrapedResource
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.useCase.ScrapeForDataUseCase
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -18,6 +22,12 @@ class ScrapingService(
     private val scrapingFailureDetectionService: ScrapingFailureDetectionService
 ) {
     private val log = KotlinLogging.logger { }
+
+    suspend fun scrapeResources(resources: List<ScrapedResource>): List<ScrapedData> = coroutineScope {
+        resources
+            .map { async { scrapeUrl(it.url, it.fields) } }
+            .awaitAll()
+    }
 
     suspend fun scrapeUrl(
         resourceUrl: String,
