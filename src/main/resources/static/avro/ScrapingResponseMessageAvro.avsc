@@ -1,7 +1,7 @@
 {
   "type": "record",
   "namespace": "generated.com.shykial.kScraperCore.avro",
-  "name": "ScrapingResponseMessage",
+  "name": "ScrapingResponseMessageAvro",
   "fields": [
     {
       "name": "requestId",

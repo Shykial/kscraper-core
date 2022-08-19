@@ -1,5 +1,6 @@
 package com.shykial.kScraperCore.service
 
+import com.shykial.kScraperCore.mapper.toAvroMessage
 import com.shykial.kScraperCore.model.ScrapingRequestMessage
 import com.shykial.kScraperCore.model.ScrapingResponseMessage
 import com.shykial.kScraperCore.producer.ScrapingResponseMessagesProducer
@@ -17,6 +18,6 @@ class ScrapingMessagesService(
             requestId = scrapingRequest.requestId,
             scrapingResults = scrapingResults
         )
-        scrapingResponseMessagesProducer.publishScrapingResponseMessage(responseMessage)
+        scrapingResponseMessagesProducer.publishScrapingResponseMessage(responseMessage.toAvroMessage())
     }
 }
