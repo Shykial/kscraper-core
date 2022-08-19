@@ -135,7 +135,7 @@ avro {
     isCreateSetters.set(false)
     isCreateOptionalGetters.set(false)
     isGettersReturnOptional.set(false)
-    fieldVisibility.set("PUBLIC")
+    fieldVisibility.set("PRIVATE")
     outputCharacterEncoding.set("UTF-8")
     stringType.set("String")
     templateDirectory.set(null as String?)

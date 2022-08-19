@@ -2,9 +2,12 @@ package com.shykial.kScraperCore.mapper
 
 import com.shykial.kScraperCore.model.ResourceScrapingResult
 import com.shykial.kScraperCore.model.ScrapedData
+import com.shykial.kScraperCore.model.ScrapedResource
 import com.shykial.kScraperCore.model.ScrapingOutcome
+import com.shykial.kScraperCore.model.ScrapingRequestMessage
 import com.shykial.kScraperCore.model.ScrapingResponseMessage
 import generated.com.shykial.kScraperCore.avro.ScrapingFailure
+import generated.com.shykial.kScraperCore.avro.ScrapingRequestMessageAvro
 import generated.com.shykial.kScraperCore.avro.ScrapingResponseMessageAvro
 import generated.com.shykial.kScraperCore.avro.ScrapingSuccess
 import generated.com.shykial.kScraperCore.models.ScrapedDataResponse
@@ -34,6 +37,11 @@ fun ScrapingResponseMessage.toAvroMessage() = ScrapingResponseMessageAvro(
             it.scrapingOutcome.toAvroOutcome()
         )
     }
+)
+
+fun ScrapingRequestMessageAvro.toModel() = ScrapingRequestMessage(
+    requestId = requestId,
+    scrapedResources = scrapedResources.map { ScrapedResource(url = it.url, fields = it.fields) }
 )
 
 private fun ScrapingOutcome.toAvroOutcome() = when (this) {

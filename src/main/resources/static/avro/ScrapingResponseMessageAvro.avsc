@@ -8,7 +8,7 @@
       "type": "string"
     },
     {
-      "name": "ScrapingResults",
+      "name": "scrapingResults",
       "type": {
         "type": "array",
         "items": {
