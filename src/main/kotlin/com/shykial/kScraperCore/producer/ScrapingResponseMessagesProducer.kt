@@ -1,7 +1,9 @@
 package com.shykial.kScraperCore.producer
 
+import com.shykial.kScraperCore.configuration.rabbitmq.AvroSerializer
 import generated.com.shykial.kScraperCore.avro.ScrapingResponseMessageAvro
 import mu.KotlinLogging
+import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -9,8 +11,9 @@ import org.springframework.stereotype.Component
 @Component
 class ScrapingResponseMessagesProducer(
     private val rabbitTemplate: RabbitTemplate,
-    @Value("\${rabbitmq.producer.exchange}") private val producerExchange: String,
-    @Value("\${rabbitmq.producer.queue.scraping-response}") private val scrapingResponseQueue: String
+    @Value("\${rabbitmq.exchange.scraping}") private val producerExchange: String,
+    @Value("\${rabbitmq.producer.queue.scraping-response}") private val scrapingResponseQueue: String,
+    private val serializer: AvroSerializer<ScrapingResponseMessageAvro>
 ) {
     private val log = KotlinLogging.logger { }
 
@@ -21,10 +24,10 @@ class ScrapingResponseMessagesProducer(
                queue: $scrapingResponseQueue"
             """.trimIndent()
         )
-        rabbitTemplate.convertAndSend(
+        rabbitTemplate.send(
             producerExchange,
             scrapingResponseQueue,
-            response
+            Message(serializer.serialize(response))
         )
     }
 }

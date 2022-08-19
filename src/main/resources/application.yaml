@@ -47,12 +47,12 @@ scraping:
   max-attempts: 3
 
 rabbitmq:
+  exchange:
+    scraping: kscraper.core.scraping
   consumer:
-    exchange: kscraper.core
     queue:
       scraping-request: "scraping.request"
   producer:
-    exchange: kDealFinder
     queue:
       scraping-response: "scraping.response"
 
