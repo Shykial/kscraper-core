@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.config.libraryBugFixes
+package com.shykial.kScraperCore.configuration.libraryBugFixes
 
 import org.springframework.core.KotlinReflectionParameterNameDiscoverer
 import org.springframework.core.ParameterNameDiscoverer

@@ -1,0 +1,66 @@
+{
+  "type": "record",
+  "namespace": "generated.com.shykial.kScraperCore.avro",
+  "name": "ScrapingResponseMessageAvro",
+  "fields": [
+    {
+      "name": "requestId",
+      "type": "string"
+    },
+    {
+      "name": "scrapingResults",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "ResourceScrapingResult",
+          "fields": [
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "scrapingOutcome",
+              "type": [
+                {
+                  "type": "enum",
+                  "name": "ScrapingFailure",
+                  "symbols": [
+                    "FAILURE"
+                  ]
+                },
+                {
+                  "type": "record",
+                  "name": "ScrapingSuccess",
+                  "fields": [
+                    {
+                      "name": "scrapedFields",
+                      "type": {
+                        "type": "map",
+                        "values": "string"
+                      }
+                    },
+                    {
+                      "name": "failedFields",
+                      "type": {
+                        "type": "array",
+                        "items": "string"
+                      }
+                    },
+                    {
+                      "name": "timestamp",
+                      "type": {
+                        "type": "long",
+                        "logicalType": "timestamp-millis"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -22,7 +22,7 @@ import com.shykial.kScraperCore.model.entity.ExtractingDetails
 import com.shykial.kScraperCore.model.entity.RegexReplacement
 import com.shykial.kScraperCore.model.entity.Selector
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import generated.com.shykial.kScraperCore.models.AddExtractingDetailsResponse
 import generated.com.shykial.kScraperCore.models.ExtractedFieldDetails
 import generated.com.shykial.kScraperCore.models.ExtractedPropertyType
@@ -55,7 +55,7 @@ internal class ExtractingDetailsEndpointTest(
     override val objectMapper: ObjectMapper,
     override val usersInitializer: UsersInitializer,
     private val extractingDetailsRepository: ExtractingDetailsRepository
-) : RestTestWithAuthentication, MongoDBStarter {
+) : RestTestWithAuthentication, RequiredServicesStarter {
 
     @BeforeEach
     fun setup() = runTest {

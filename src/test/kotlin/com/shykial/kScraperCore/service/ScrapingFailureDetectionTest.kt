@@ -1,7 +1,7 @@
 package com.shykial.kScraperCore.service
 
 import com.ninjasquad.springmockk.MockkBean
-import com.shykial.kScraperCore.config.KScraperAuditor
+import com.shykial.kScraperCore.configuration.KScraperAuditor
 import com.shykial.kScraperCore.helper.WithPreInitializedUsers
 import com.shykial.kScraperCore.helper.findRefreshed
 import com.shykial.kScraperCore.helper.saveIn
@@ -14,7 +14,7 @@ import com.shykial.kScraperCore.model.entity.Selector
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import io.kotest.assertions.timing.continually
 import io.kotest.assertions.timing.eventually
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -51,7 +51,7 @@ class ScrapingFailureDetectionTest(
     private val extractingDetailsRepository: ExtractingDetailsRepository,
     override val usersInitializer: UsersInitializer,
     @Value("\${scraping.max-attempts}") private val scrapingMaxAttempts: Int
-) : MongoDBStarter, WithPreInitializedUsers {
+) : RequiredServicesStarter, WithPreInitializedUsers {
 
     @MockkBean
     private lateinit var javaMailSender: JavaMailSender

@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.config
+package com.shykial.kScraperCore.configuration
 
 import com.shykial.kScraperCore.extension.runSuspend
 import com.shykial.kScraperCore.model.entity.UserRole

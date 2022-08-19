@@ -21,7 +21,7 @@ import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.starter.MockServerStarter
 import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerClient
 import com.shykial.kScraperCore.starter.MockServerStarter.Companion.mockServerUrl
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import generated.com.shykial.kScraperCore.models.ScrapedDataResponse
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ class ScrapingEndpointTest(
     private val domainRequestDetailsRepository: DomainRequestDetailsRepository,
     private val extractingDetailsRepository: ExtractingDetailsRepository,
     private val httpCallMocker: HttpCallMocker
-) : RestTestWithAuthentication, MongoDBStarter, MockServerStarter {
+) : RestTestWithAuthentication, RequiredServicesStarter, MockServerStarter {
 
     @BeforeEach
     fun setup() = runTest {

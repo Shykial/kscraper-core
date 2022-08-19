@@ -17,7 +17,7 @@ import com.shykial.kScraperCore.model.entity.ApplicationUser
 import com.shykial.kScraperCore.model.entity.UserRole
 import com.shykial.kScraperCore.repository.ApplicationUserRepository
 import com.shykial.kScraperCore.security.JwtProperties
-import com.shykial.kScraperCore.starter.MongoDBStarter
+import com.shykial.kScraperCore.starter.RequiredServicesStarter
 import generated.com.shykial.kScraperCore.models.AuthToken
 import generated.com.shykial.kScraperCore.models.ErrorResponse
 import generated.com.shykial.kScraperCore.models.ErrorType
@@ -50,7 +50,7 @@ internal class AuthEndpointTest(
     private val applicationUserRepository: ApplicationUserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProperties: JwtProperties
-) : RestTest, MongoDBStarter {
+) : RestTest, RequiredServicesStarter {
 
     @BeforeEach
     fun setup() = runTest {

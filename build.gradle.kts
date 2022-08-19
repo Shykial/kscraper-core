@@ -1,3 +1,4 @@
+import com.github.davidmc24.gradle.plugin.avro.GenerateAvroJavaTask
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -13,6 +14,7 @@ val skrapeItVersion: String by project
 val mockServerClientVersion: String by project
 val jasyptVersion: String by project
 val springDocVersion: String by project
+val apacheAvroVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -23,6 +25,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlinx.kover")
     id("org.owasp.dependencycheck")
+    id("com.github.davidmc24.gradle.plugin.avro")
 }
 
 group = "com.shykial"
@@ -40,6 +43,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("com.auth0:java-jwt:$javaJwtVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -54,6 +58,7 @@ dependencies {
     }
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:$jasyptVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+    implementation("org.apache.avro:avro:$apacheAvroVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit-vintage-engine")
@@ -67,6 +72,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
     testImplementation("org.testcontainers:mockserver")
+    testImplementation("org.testcontainers:rabbitmq")
     testImplementation("org.mock-server:mockserver-client-java:$mockServerClientVersion")
     testImplementation("io.rest-assured:spring-web-test-client:$restAssuredVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockKVersion")
@@ -79,7 +85,7 @@ dependencyManagement {
 }
 
 tasks.withType<KotlinCompile> {
-    dependsOn(tasks.openApiGenerate)
+    dependsOn(tasks.openApiGenerate, "generate-avro")
     kotlinOptions {
         freeCompilerArgs = listOf(
             "-Xjsr305=strict",
@@ -98,15 +104,17 @@ tasks.withType<Test> {
 }
 
 val generatedResourcesDir = "$buildDir/generated-resources"
+val staticResourcesDir = "$rootDir/src/main/resources/static"
 
 kotlin.sourceSets["main"].kotlin.srcDir("$generatedResourcesDir/src/main/kotlin")
+java.sourceSets["main"].java.srcDir("$generatedResourcesDir/src/main/java")
 
 openApiGenerate {
-    inputSpec.set("$rootDir/src/main/resources/static/openapi/openapi.yaml")
+    inputSpec.set("$staticResourcesDir/openapi/openapi.yaml")
     generatorName.set("kotlin-spring")
     outputDir.set(generatedResourcesDir)
     packageName.set("generated.com.shykial.kScraperCore")
-    templateDir.set("$rootDir/src/main/resources/static/openapi/kotlin-spring-custom-template")
+    templateDir.set("$staticResourcesDir/openapi/kotlin-spring-custom-template")
     configOptions.putAll(
         mapOf(
             "interfaceOnly" to "true",
@@ -116,6 +124,22 @@ openApiGenerate {
             "reactive" to "true"
         )
     )
+}
+
+tasks.register<GenerateAvroJavaTask>("generate-avro") {
+    source("$staticResourcesDir/avro")
+    setOutputDir(File("$generatedResourcesDir/src/main/java"))
+}
+
+avro {
+    isCreateSetters.set(false)
+    isCreateOptionalGetters.set(false)
+    isGettersReturnOptional.set(false)
+    fieldVisibility.set("PRIVATE")
+    outputCharacterEncoding.set("UTF-8")
+    stringType.set("String")
+    templateDirectory.set(null as String?)
+    isEnableDecimalLogicalType.set(true)
 }
 
 ktlint {

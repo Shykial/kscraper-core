@@ -3,8 +3,17 @@ services:
   mongo-db:
     image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${KSCRAPER_CORE_ROOT_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${KSCRAPER_CORE_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_KSCRAPER_CORE_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_KSCRAPER_CORE_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: kscraper_core_db
     ports:
       - "27017:27017"
+
+  rabbit-mq:
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_KSCRAPER_CORE_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_KSCRAPER_CORE_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"

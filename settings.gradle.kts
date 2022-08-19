@@ -6,6 +6,7 @@ pluginManagement {
     val ktlintVersion: String by settings
     val koverVersion: String by settings
     val owaspPluginVersion: String by settings
+    val avroPluginVersion: String by settings
 
     plugins {
         kotlin("jvm") version kotlinVersion
@@ -16,6 +17,7 @@ pluginManagement {
         id("org.jlleitschuh.gradle.ktlint") version ktlintVersion
         id("org.jetbrains.kotlinx.kover") version koverVersion
         id("org.owasp.dependencycheck") version owaspPluginVersion
+        id("com.github.davidmc24.gradle.plugin.avro") version avroPluginVersion
     }
 }
 

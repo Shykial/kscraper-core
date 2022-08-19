@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "namespace": "generated.com.shykial.kScraperCore.avro",
+  "name": "ScrapingRequestMessageAvro",
+  "fields": [
+    {
+      "name": "requestId",
+      "type": "string"
+    },
+    {
+      "name": "scrapedResources",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "ScrapedResource",
+          "fields": [
+            {
+              "name": "url",
+              "type": "string"
+            },
+            {
+              "name": "fields",
+              "type": [
+                "null",
+                {
+                  "type": "array",
+                  "items": "string"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
