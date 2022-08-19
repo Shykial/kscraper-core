@@ -19,11 +19,14 @@ class ScrapingRequestsListener(
     private val log = KotlinLogging.logger { }
 
     @RabbitListener(queues = ["\${rabbitmq.consumer.queue.scraping-request}"])
-    fun consumerScrapingRequestMessage(message: Message) = mono {
-        message.body
-            .run(deserializer::deserialize)
-            .toModel()
-            .also { log.info("Received ScrapingRequestMessage with content $it") }
-            .runSuspend(scrapingMessagesService::handleScrapingRequestMessage)
+    fun consumerScrapingRequestMessage(message: Message) {
+        println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! I'm in")
+        mono {
+            message.body
+                .run(deserializer::deserialize)
+                .toModel()
+                .also { log.info("Received ScrapingRequestMessage with content $it") }
+                .runSuspend(scrapingMessagesService::handleScrapingRequestMessage)
+        }.subscribe()
     }
 }

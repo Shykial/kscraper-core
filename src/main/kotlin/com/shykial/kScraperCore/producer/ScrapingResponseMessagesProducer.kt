@@ -19,10 +19,11 @@ class ScrapingResponseMessagesProducer(
 
     fun publishScrapingResponseMessage(response: ScrapingResponseMessageAvro) {
         log.info(
-            """Sending ScrapingResponseMessage: $response
-               to exchange $producerExchange
-               queue: $scrapingResponseQueue"
-            """.trimIndent()
+            """Sending ScrapingResponseMessage: 
+                |content: $response
+                |exchange: $producerExchange
+                |queue: $scrapingResponseQueue"
+            """.trimMargin()
         )
         rabbitTemplate.send(
             producerExchange,

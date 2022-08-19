@@ -16,7 +16,7 @@ interface AvroDeserializer<T : SpecificRecord> {
     fun deserialize(input: ByteArray): T
 }
 
-inline fun <reified T : SpecificRecord> createSerializer() = object : AvroSerializer<T> {
+inline fun <reified T : SpecificRecord> createAvroSerializer() = object : AvroSerializer<T> {
     private val writer = SpecificDatumWriter(T::class.java)
 
     override fun serialize(input: T): ByteArray {
@@ -28,7 +28,7 @@ inline fun <reified T : SpecificRecord> createSerializer() = object : AvroSerial
     }
 }
 
-inline fun <reified T : SpecificRecord> createDeserializer(schema: Schema) = object : AvroDeserializer<T> {
+inline fun <reified T : SpecificRecord> createAvroDeserializer(schema: Schema) = object : AvroDeserializer<T> {
     private val reader = SpecificDatumReader(T::class.java)
 
     override fun deserialize(input: ByteArray): T {
