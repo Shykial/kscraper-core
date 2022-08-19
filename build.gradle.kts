@@ -1,3 +1,4 @@
+import com.github.davidmc24.gradle.plugin.avro.GenerateAvroJavaTask
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -13,6 +14,7 @@ val skrapeItVersion: String by project
 val mockServerClientVersion: String by project
 val jasyptVersion: String by project
 val springDocVersion: String by project
+val apacheAvroVersion: String by project
 
 plugins {
     kotlin("jvm")
@@ -23,6 +25,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlinx.kover")
     id("org.owasp.dependencycheck")
+    id("com.github.davidmc24.gradle.plugin.avro")
 }
 
 group = "com.shykial"
@@ -55,6 +58,7 @@ dependencies {
     }
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:$jasyptVersion")
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+    implementation("org.apache.avro:avro:$apacheAvroVersion")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit-vintage-engine")
@@ -81,7 +85,7 @@ dependencyManagement {
 }
 
 tasks.withType<KotlinCompile> {
-    dependsOn(tasks.openApiGenerate)
+    dependsOn(tasks.openApiGenerate, "generate-avro")
     kotlinOptions {
         freeCompilerArgs = listOf(
             "-Xjsr305=strict",
@@ -100,15 +104,17 @@ tasks.withType<Test> {
 }
 
 val generatedResourcesDir = "$buildDir/generated-resources"
+val staticResourcesDir = "$rootDir/src/main/resources/static"
 
 kotlin.sourceSets["main"].kotlin.srcDir("$generatedResourcesDir/src/main/kotlin")
+java.sourceSets["main"].java.srcDir("$generatedResourcesDir/src/main/java")
 
 openApiGenerate {
-    inputSpec.set("$rootDir/src/main/resources/static/openapi/openapi.yaml")
+    inputSpec.set("$staticResourcesDir/openapi/openapi.yaml")
     generatorName.set("kotlin-spring")
     outputDir.set(generatedResourcesDir)
     packageName.set("generated.com.shykial.kScraperCore")
-    templateDir.set("$rootDir/src/main/resources/static/openapi/kotlin-spring-custom-template")
+    templateDir.set("$staticResourcesDir/openapi/kotlin-spring-custom-template")
     configOptions.putAll(
         mapOf(
             "interfaceOnly" to "true",
@@ -118,6 +124,22 @@ openApiGenerate {
             "reactive" to "true"
         )
     )
+}
+
+tasks.register<GenerateAvroJavaTask>("generate-avro") {
+    source("$staticResourcesDir/avro")
+    setOutputDir(File("$generatedResourcesDir/src/main/java"))
+}
+
+avro {
+    isCreateSetters.set(false)
+    isCreateOptionalGetters.set(false)
+    isGettersReturnOptional.set(false)
+    fieldVisibility.set("PUBLIC")
+    outputCharacterEncoding.set("UTF-8")
+    stringType.set("String")
+    templateDirectory.set(null as String?)
+    isEnableDecimalLogicalType.set(true)
 }
 
 ktlint {

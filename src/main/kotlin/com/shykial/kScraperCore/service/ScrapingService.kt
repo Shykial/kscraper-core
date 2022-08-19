@@ -1,8 +1,11 @@
 package com.shykial.kScraperCore.service
 
 import com.shykial.kScraperCore.exception.NotFoundException
+import com.shykial.kScraperCore.mapper.toResourceScrapingResult
+import com.shykial.kScraperCore.model.ResourceScrapingResult
 import com.shykial.kScraperCore.model.ScrapedData
 import com.shykial.kScraperCore.model.ScrapedResource
+import com.shykial.kScraperCore.model.ScrapingOutcome
 import com.shykial.kScraperCore.repository.DomainRequestDetailsRepository
 import com.shykial.kScraperCore.repository.ExtractingDetailsRepository
 import com.shykial.kScraperCore.useCase.ScrapeForDataUseCase
@@ -23,10 +26,17 @@ class ScrapingService(
 ) {
     private val log = KotlinLogging.logger { }
 
-    suspend fun scrapeResources(resources: List<ScrapedResource>): List<ScrapedData> = coroutineScope {
+    suspend fun scrapeResources(resources: List<ScrapedResource>): List<ResourceScrapingResult> = coroutineScope {
         resources
-            .map { async { scrapeUrl(it.url, it.fields) } }
-            .awaitAll()
+            .map { resource ->
+                async {
+                    runCatching { scrapeUrl(resource.url, resource.fields) }
+                        .onFailure { log.error(it) { "Exception while handling scraping resource: $resource" } }
+                        .getOrNull()
+                        ?.toResourceScrapingResult()
+                        ?: ResourceScrapingResult(url = resource.url, scrapingOutcome = ScrapingOutcome.Failure)
+                }
+            }.awaitAll()
     }
 
     suspend fun scrapeUrl(

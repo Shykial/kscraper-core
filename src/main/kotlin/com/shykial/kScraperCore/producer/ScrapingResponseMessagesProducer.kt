@@ -1,5 +1,6 @@
 package com.shykial.kScraperCore.producer
 
+import com.shykial.kScraperCore.mapper.toAvroMessage
 import com.shykial.kScraperCore.model.ScrapingResponseMessage
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +16,7 @@ class ScrapingResponseMessagesProducer(
         rabbitTemplate.convertAndSend(
             producerExchange,
             scrapingResponseQueue,
-            response
+            response.toAvroMessage()
         )
     }
 }

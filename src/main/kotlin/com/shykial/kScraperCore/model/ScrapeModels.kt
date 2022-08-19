@@ -22,5 +22,20 @@ data class ScrapedResource(
 
 data class ScrapingResponseMessage(
     val requestId: String,
-    val scrapedData: List<ScrapedData>
+    val scrapingResults: List<ResourceScrapingResult>
 )
+
+data class ResourceScrapingResult(
+    val url: String,
+    val scrapingOutcome: ScrapingOutcome
+)
+
+sealed interface ScrapingOutcome {
+    object Failure : ScrapingOutcome
+
+    data class Success(
+        val scrapedFields: Map<String, String>,
+        val failedFields: List<String>,
+        val timestamp: Instant
+    ) : ScrapingOutcome
+}
