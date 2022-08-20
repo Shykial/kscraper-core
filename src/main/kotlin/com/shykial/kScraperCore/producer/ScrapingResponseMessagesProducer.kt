@@ -22,7 +22,7 @@ class ScrapingResponseMessagesProducer(
             """Sending ScrapingResponseMessage: 
                 |content: $response
                 |exchange: $producerExchange
-                |queue: $scrapingResponseQueue"
+                |queue: $scrapingResponseQueue
             """.trimMargin()
         )
         rabbitTemplate.send(

@@ -20,7 +20,6 @@ class ScrapingRequestsListener(
 
     @RabbitListener(queues = ["\${rabbitmq.consumer.queue.scraping-request}"])
     fun consumerScrapingRequestMessage(message: Message) {
-        println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! I'm in")
         mono {
             message.body
                 .run(deserializer::deserialize)
