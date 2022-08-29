@@ -18,12 +18,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@AllowedForDev
 class ExtractingDetailsController(
     private val extractingDetailsService: ExtractingDetailsService
 ) : ExtractingDetailsApi, RestScope {
     private val log = KotlinLogging.logger { }
 
-    @AllowedForDev
     override suspend fun findExtractingDetailsById(id: String): ResponseEntity<ExtractingDetailsResponse> {
         log.info("Received find extracting details request for extractingDetails ID: $id")
         return extractingDetailsService.findByExtractingFieldDetailsId(id)
@@ -31,7 +31,6 @@ class ExtractingDetailsController(
             .toResponseEntity()
     }
 
-    @AllowedForDev
     override suspend fun findExtractingDetails(
         domainId: String,
         fieldNames: List<String>?
@@ -42,7 +41,6 @@ class ExtractingDetailsController(
             .toResponseEntity()
     }
 
-    @AllowedForDev
     override suspend fun addExtractingDetails(
         extractingDetailsRequest: ExtractingDetailsRequest
     ): ResponseEntity<AddExtractingDetailsResponse> = extractingDetailsRequest
@@ -55,13 +53,12 @@ class ExtractingDetailsController(
         .toResponse()
         .toResponseEntity(HttpStatus.CREATED)
 
-    @AllowedForDev
     override suspend fun updateExtractingDetails(
         id: String,
         extractingDetailsUpdateRequest: ExtractingDetailsUpdateRequest
     ): ResponseEntity<Unit> {
         log.info("Received update extracting details request for extractingDetails ID: $id")
         extractingDetailsService.updateExtractingDetails(id, extractingDetailsUpdateRequest)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
+        return noContentResponseEntity()
     }
 }

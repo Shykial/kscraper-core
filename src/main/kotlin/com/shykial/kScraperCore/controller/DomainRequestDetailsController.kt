@@ -14,24 +14,22 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@AllowedForDev
 class DomainRequestDetailsController(
     private val domainRequestDetailsService: DomainRequestDetailsService
 ) : DomainRequestDetailsApi, RestScope {
     private val log = KotlinLogging.logger { }
 
-    @AllowedForDev
     override suspend fun findDomainRequestDetailsById(id: String): ResponseEntity<DomainRequestDetailsResponse> {
         log.info("Received getDomainRequestDetails request for domainRequestDetailsId: $id")
         return domainRequestDetailsService.findByDomainRequestDetailsId(id).toResponse().toResponseEntity()
     }
 
-    @AllowedForDev
     override suspend fun findDomainRequestDetails(domainName: String): ResponseEntity<DomainRequestDetailsResponse> {
         log.info("Received getDomainRequestDetails request for domainName $domainName")
         return domainRequestDetailsService.findByDomainName(domainName).toResponse().toResponseEntity()
     }
 
-    @AllowedForDev
     override suspend fun addDomainRequestDetails(
         domainRequestDetailsRequest: DomainRequestDetailsRequest
     ): ResponseEntity<DomainRequestDetailsResponse> = domainRequestDetailsRequest
@@ -40,13 +38,12 @@ class DomainRequestDetailsController(
         .toResponse()
         .toResponseEntity(HttpStatus.CREATED)
 
-    @AllowedForDev
     override suspend fun updateDomainRequestDetails(
         id: String,
         domainRequestDetailsRequest: DomainRequestDetailsRequest
     ): ResponseEntity<Unit> {
         log.info("Received update domain request details request for domainRequestDetails ID: $id")
         domainRequestDetailsService.updateDomainRequestDetails(id, domainRequestDetailsRequest)
-        return ResponseEntity(HttpStatus.NO_CONTENT)
+        return noContentResponseEntity()
     }
 }

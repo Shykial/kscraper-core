@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono
 class JwtServerAuthenticationConverter : ServerAuthenticationConverter {
     override fun convert(exchange: ServerWebExchange): Mono<Authentication> = mono {
         exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION)
+            ?.takeIf { it.isNotBlank() }
             ?.substringAfter(JwtProperties.AUTH_HEADER_PREFIX)
             ?.run(::JwtAuthenticationToken)
     }
@@ -45,7 +46,9 @@ class JwtAuthenticationManager(
                 ?.let {
                     val authorities = it.roles?.map { role -> SimpleGrantedAuthority("$ROLE_PREFIX$role") }
                     UsernamePasswordAuthenticationToken(it.subject, null, authorities)
-                } ?: throw AuthenticationException("Authentication failed for $authentication")
+                } ?: run {
+                throw AuthenticationException("Authentication failed for $authentication")
+            }
         }.getOrElse {
             log.error(it) { it.message }
             throw JwtAuthenticationException("ex", it)
@@ -54,7 +57,7 @@ class JwtAuthenticationManager(
 
     private suspend fun DecodedToken.refersToValidUser() =
         subject != null && !roles.isNullOrEmpty() &&
-            applicationUserRepository.findByLogin(subject)?.isDisabled == false
+            applicationUserRepository.findByLogin(subject)?.enabled == true
 }
 
 data class JwtAuthenticationToken(val token: String) : AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {

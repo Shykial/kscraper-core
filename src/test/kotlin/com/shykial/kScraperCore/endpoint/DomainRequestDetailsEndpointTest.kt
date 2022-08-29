@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
-private const val DOMAIN_REQUEST_DETAILS_ENDPOINT = "$BASE_PATH/domain-request-details"
+private const val DOMAIN_REQUEST_DETAILS_ENDPOINT_URL = "$BASE_PATH/domain-request-details"
 
 @KScraperRestTest
 internal class DomainRequestDetailsEndpointTest(
@@ -56,7 +56,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 queryParam("domainName", entity.domainName)
             } When {
-                get(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+                get(DOMAIN_REQUEST_DETAILS_ENDPOINT_URL)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -70,7 +70,7 @@ internal class DomainRequestDetailsEndpointTest(
             val entity = getSampleDomainRequestDetails().saveIn(domainRequestDetailsRepository)
 
             When {
-                get("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${entity.id}")
+                get("$DOMAIN_REQUEST_DETAILS_ENDPOINT_URL/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -87,7 +87,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT_URL)
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<DomainRequestDetailsResponse> {
@@ -113,7 +113,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(updateRequest)
             } When {
-                put("$DOMAIN_REQUEST_DETAILS_ENDPOINT/${initialDomainRequestDetails.id}")
+                put("$DOMAIN_REQUEST_DETAILS_ENDPOINT_URL/${initialDomainRequestDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
@@ -135,7 +135,7 @@ internal class DomainRequestDetailsEndpointTest(
                 Given {
                     queryParam("domainName", randomAlphanumeric(20))
                 } When {
-                    get(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+                    get(DOMAIN_REQUEST_DETAILS_ENDPOINT_URL)
                 } Then {
                     status(HttpStatus.NOT_FOUND)
                     extractingBody<ErrorResponse> {
@@ -152,7 +152,7 @@ internal class DomainRequestDetailsEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT_URL)
             } Then {
                 status(HttpStatus.CONFLICT)
             }
@@ -166,7 +166,7 @@ internal class DomainRequestDetailsEndpointTest(
                 apiUserAuthHeader()
                 jsonBody(request)
             } When {
-                post(DOMAIN_REQUEST_DETAILS_ENDPOINT)
+                post(DOMAIN_REQUEST_DETAILS_ENDPOINT_URL)
             } Then {
                 status(HttpStatus.FORBIDDEN)
             }

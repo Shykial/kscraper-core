@@ -11,12 +11,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@AllowedForApiUser
 class ScrapingController(
     private val scrapingService: ScrapingService
 ) : ScrapingApi, RestScope {
     private val log = KotlinLogging.logger { }
 
-    @AllowedForApiUser
     override suspend fun scrapeResource(url: String, fields: List<String>?): ResponseEntity<ScrapedDataResponse> {
         log.info("Received request to scrape resource at url $url for fields $fields")
         return scrapingService.scrapeUrl(url, fields)

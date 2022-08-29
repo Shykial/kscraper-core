@@ -7,7 +7,6 @@ import com.shykial.kScraperCore.repository.ApplicationUserRepository
 import com.shykial.kScraperCore.security.component.JwtProvider
 import com.shykial.kScraperCore.security.component.JwtToken
 import mu.KotlinLogging
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Component
 
 @Component
@@ -32,12 +31,12 @@ class UsersInitializer(
     val groupedInitUsers = users.groupBy { it.role }
 
     suspend fun assureUsersPresentInDB() {
-        try {
+        runCatching {
             users
                 .also { log.info { "Persisting users $it" } }
                 .saveAllIn(applicationUserRepository)
-        } catch (_: DuplicateKeyException) {
-            log.info("Skipping duplicateKeyException for users initialization")
+        }.onFailure {
+            log.info("Skipping exception $it during users initialization")
         }
     }
 

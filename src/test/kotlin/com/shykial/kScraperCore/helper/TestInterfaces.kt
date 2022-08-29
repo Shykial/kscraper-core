@@ -20,6 +20,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @AutoConfigureWebTestClient(timeout = "PT20S")
 annotation class KScraperRestTest
 
+private val emptyAuthHeader = Header(HttpHeaders.AUTHORIZATION, "")
+
 interface RestTest {
     val objectMapper: ObjectMapper
     val webTestClient: WebTestClient
@@ -30,7 +32,14 @@ interface RestTest {
 
     @BeforeAll
     fun setupRestAssured() {
+        setupRestAssuredRequestConfig()
         RestAssuredWebTestClient.webTestClient(webTestClient)
+    }
+
+    fun setupRestAssuredRequestConfig() {
+        RestAssuredWebTestClient.requestSpecification = Given {
+            header(emptyAuthHeader)
+        }
     }
 
     fun WebTestClientRequestSpecification.jsonBody(body: Any?): WebTestClientRequestSpecification =
@@ -50,8 +59,7 @@ interface WithPreInitializedUsers {
 }
 
 interface RestTestWithAuthentication : RestTest, WithPreInitializedUsers {
-    @BeforeAll
-    fun setupAdminAuthentication() = runTest {
+    override fun setupRestAssuredRequestConfig() {
         RestAssuredWebTestClient.requestSpecification = Given {
             adminAuthHeader()
         }.config(
@@ -72,15 +80,23 @@ interface RestTestWithAuthentication : RestTest, WithPreInitializedUsers {
         )
     )
 
+    fun WebTestClientRequestSpecification.devAuthHeader(
+        devLogin: String? = null
+    ): WebTestClientRequestSpecification = header(
+        HttpHeaders.AUTHORIZATION,
+        usersInitializer.getUserJwtToken(
+            userRole = UserRole.DEV,
+            userLogin = devLogin
+        ).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
+    )
+
     fun WebTestClientRequestSpecification.apiUserAuthHeader(
         userLogin: String? = null
     ): WebTestClientRequestSpecification = header(
-        Header(
-            HttpHeaders.AUTHORIZATION,
-            usersInitializer.getUserJwtToken(
-                userRole = UserRole.API_USER,
-                userLogin = userLogin
-            ).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
-        )
+        HttpHeaders.AUTHORIZATION,
+        usersInitializer.getUserJwtToken(
+            userRole = UserRole.API_USER,
+            userLogin = userLogin
+        ).let { JwtProperties.AUTH_HEADER_PREFIX + it.token }
     )
 }

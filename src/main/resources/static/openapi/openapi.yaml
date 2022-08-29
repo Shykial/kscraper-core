@@ -14,6 +14,8 @@ tags:
     description: Operations related to domain request details
   - name: Scraping
     description: Operations related to scraping websites data
+  - name: Admin Operations
+    description: Administrative operations
 
 paths:
   /auth/login:
@@ -281,6 +283,46 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /administrative/change-account-state:
+    put:
+      tags:
+        - Admin Operations
+      operationId: changeAccountState
+      description: change given account's state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeAccountStateRequest'
+      responses:
+        204:
+          description: No content
+        401:
+          description: Unauthorized
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /administrative/change-email:
+    put:
+      tags:
+        - Admin Operations
+      operationId: changeUserEmail
+      description: Change given user's email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUserEmailRequest'
+      responses:
+        204:
+          description: No content
+        401:
+          description: Unauthorized
+        404:
+          $ref: '#/components/responses/NotFound'
+
 security:
   - bearerAuth: [ ]
 
@@ -476,6 +518,35 @@ components:
         - base64EncodedRegex
         - replacement
 
+    ChangeAccountStateRequest:
+      type: object
+      properties:
+        accountLogin:
+          type: string
+        newState:
+          $ref: '#/components/schemas/AccountState'
+      required:
+        - accountLogin
+        - newState
+
+    AccountState:
+      type: string
+      enum:
+        - ENABLED
+        - DISABLED
+
+    ChangeUserEmailRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        newEmail:
+          type: string
+          format: email
+      required:
+        - login
+        - newEmail
+
     ErrorResponse:
       type: object
       properties:
@@ -506,7 +577,6 @@ components:
         rejectedValue: { }
       required:
         - fieldName
-
     ErrorType:
       type: string
       enum:
