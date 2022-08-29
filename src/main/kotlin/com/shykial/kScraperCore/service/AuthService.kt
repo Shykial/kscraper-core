@@ -19,7 +19,7 @@ class AuthService(
 ) {
     suspend fun login(loginRequest: LoginRequest): JwtToken =
         applicationUserRepository.findByLogin(loginRequest.login)
-            ?.takeIf { passwordEncoder.matches(loginRequest.password, it.passwordHash) && !it.isDisabled }
+            ?.takeIf { passwordEncoder.matches(loginRequest.password, it.passwordHash) && it.enabled }
             ?.let {
                 jwtProvider.createToken(
                     subject = loginRequest.login,

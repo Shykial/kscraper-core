@@ -10,6 +10,8 @@ import kotlin.time.Duration
 
 interface RestScope {
     fun <T> T.toResponseEntity(status: HttpStatus = HttpStatus.OK): ResponseEntity<T> = ResponseEntity(this, status)
+
+    fun Any?.noContentResponseEntity() = ResponseEntity<Unit>(HttpStatus.NO_CONTENT)
 }
 
 suspend fun <T : BaseDocument> T.saveIn(

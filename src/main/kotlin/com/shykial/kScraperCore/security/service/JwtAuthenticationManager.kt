@@ -54,7 +54,7 @@ class JwtAuthenticationManager(
 
     private suspend fun DecodedToken.refersToValidUser() =
         subject != null && !roles.isNullOrEmpty() &&
-            applicationUserRepository.findByLogin(subject)?.isDisabled == false
+            applicationUserRepository.findByLogin(subject)?.enabled == true
 }
 
 data class JwtAuthenticationToken(val token: String) : AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {

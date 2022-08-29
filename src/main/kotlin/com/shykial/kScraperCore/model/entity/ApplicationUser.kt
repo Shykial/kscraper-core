@@ -15,7 +15,7 @@ data class ApplicationUser(
 
     val role: UserRole = UserRole.API_USER,
 
-    var isDisabled: Boolean = false
+    var enabled: Boolean = true
 ) : BaseDocument()
 
 enum class UserRole {

@@ -180,7 +180,7 @@ internal class AuthEndpointTest(
         passwordHash = passwordEncoder.encode(rawPassword),
         email = "testEmail@testDomain.com",
         role = UserRole.API_USER,
-        isDisabled = false
+        enabled = true
     )
 
     private fun DecodedJWT.assertProperTokenGenerated(validUser: ApplicationUser) {

@@ -1,6 +1,7 @@
 package com.shykial.kScraperCore.controller
 
 import com.shykial.kScraperCore.extension.runSuspend
+import com.shykial.kScraperCore.helper.AllowedForAll
 import com.shykial.kScraperCore.helper.RestScope
 import com.shykial.kScraperCore.service.AuthService
 import generated.com.shykial.kScraperCore.apis.AuthApi
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@AllowedForAll
 class AuthController(
     private val authService: AuthService
 ) : AuthApi, RestScope {

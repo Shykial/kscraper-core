@@ -14,3 +14,6 @@ annotation class AllowedForDev
 
 @PreAuthorize("hasAnyRole('$ADMIN_ROLE_NAME', '$DEV_ROLE_NAME', '$API_USER_ROLE_NAME')")
 annotation class AllowedForApiUser
+
+@PreAuthorize("permitAll()")
+annotation class AllowedForAll
