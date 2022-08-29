@@ -47,7 +47,7 @@ import kotlin.random.nextInt
 import generated.com.shykial.kScraperCore.models.RegexReplacement as RegexReplacementInApi
 import generated.com.shykial.kScraperCore.models.Selector as SelectorInApi
 
-private const val EXTRACTING_DETAILS_PATH = "$BASE_PATH/extracting-details"
+private const val EXTRACTING_DETAILS_PATH_URL = "$BASE_PATH/extracting-details"
 
 @KScraperRestTest
 internal class ExtractingDetailsEndpointTest(
@@ -73,7 +73,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 jsonBody(sampleExtractingDetailsRequest)
             } When {
-                post(EXTRACTING_DETAILS_PATH)
+                post(EXTRACTING_DETAILS_PATH_URL)
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<AddExtractingDetailsResponse> { response ->
@@ -95,7 +95,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 queryParam("domainId", domainId)
             } When {
-                get(EXTRACTING_DETAILS_PATH)
+                get(EXTRACTING_DETAILS_PATH_URL)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -110,7 +110,7 @@ internal class ExtractingDetailsEndpointTest(
                 .saveIn(extractingDetailsRepository)
 
             When {
-                get("$EXTRACTING_DETAILS_PATH/${entity.id}")
+                get("$EXTRACTING_DETAILS_PATH_URL/${entity.id}")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<ExtractingDetailsResponse> {
@@ -130,7 +130,7 @@ internal class ExtractingDetailsEndpointTest(
                 queryParam("domainId", domainId)
                 queryParam("fieldNames", randomEntities.map { it.fieldName })
             } When {
-                get(EXTRACTING_DETAILS_PATH)
+                get(EXTRACTING_DETAILS_PATH_URL)
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<List<ExtractingDetailsResponse>> { response ->
@@ -165,7 +165,7 @@ internal class ExtractingDetailsEndpointTest(
             Given {
                 jsonBody(updateRequest)
             } When {
-                put("$EXTRACTING_DETAILS_PATH/${initialExtractingDetails.id}")
+                put("$EXTRACTING_DETAILS_PATH_URL/${initialExtractingDetails.id}")
             } Then {
                 status(HttpStatus.NO_CONTENT)
 
@@ -191,7 +191,7 @@ internal class ExtractingDetailsEndpointTest(
                 queryParam("domainId", "sampleDomainId")
                 queryParam("fieldNames", "fieldName1,fieldName2")
             } When {
-                get(EXTRACTING_DETAILS_PATH)
+                get(EXTRACTING_DETAILS_PATH_URL)
             } Then {
                 status(HttpStatus.FORBIDDEN)
             }

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.shykial.kScraperCore.extension.plusMinutes
+import com.shykial.kScraperCore.extension.runSuspend
 import com.shykial.kScraperCore.helper.Given
 import com.shykial.kScraperCore.helper.KScraperRestTest
 import com.shykial.kScraperCore.helper.RestTest
@@ -27,8 +28,8 @@ import generated.com.shykial.kScraperCore.models.LoginRequest
 import generated.com.shykial.kScraperCore.models.RegisterUserRequest
 import generated.com.shykial.kScraperCore.models.RejectedField
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -41,7 +42,9 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Duration
 import java.time.Instant
 
-private const val AUTH_ENDPOINT = "$BASE_PATH/auth"
+private const val AUTH_ENDPOINT_URL = "$BASE_PATH/auth"
+
+private const val SAMPLE_VALID_USER_LOGIN = "testLogin"
 
 @KScraperRestTest
 internal class AuthEndpointTest(
@@ -54,7 +57,8 @@ internal class AuthEndpointTest(
 
     @BeforeEach
     fun setup() = runTest {
-        applicationUserRepository.deleteAll()
+        applicationUserRepository.findByLogin(SAMPLE_VALID_USER_LOGIN)
+            ?.runSuspend(applicationUserRepository::delete)
     }
 
     @Nested
@@ -67,7 +71,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(loginRequest)
             } When {
-                post("$AUTH_ENDPOINT/login")
+                post("$AUTH_ENDPOINT_URL/login")
             } Then {
                 status(HttpStatus.OK)
                 extractingBody<AuthToken> {
@@ -83,12 +87,12 @@ internal class AuthEndpointTest(
                 email = "proper@email.com",
                 password = "properPassword4812$"
             )
-            applicationUserRepository.findAll().toList().shouldBeEmpty()
+            applicationUserRepository.findAll().toList().find { it.login == request.login }.shouldBeNull()
 
             Given {
                 jsonBody(request)
             } When {
-                post("$AUTH_ENDPOINT/register")
+                post("$AUTH_ENDPOINT_URL/register")
             } Then {
                 status(HttpStatus.CREATED)
                 extractingBody<IdResponse> { response ->
@@ -108,7 +112,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(invalidLoginRequest)
             } When {
-                post("$AUTH_ENDPOINT/login")
+                post("$AUTH_ENDPOINT_URL/login")
             } Then {
                 status(HttpStatus.UNAUTHORIZED)
                 extractingBody<ErrorResponse> {
@@ -128,7 +132,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(invalidRequest)
             } When {
-                post("$AUTH_ENDPOINT/register")
+                post("$AUTH_ENDPOINT_URL/register")
             } Then {
                 status(HttpStatus.BAD_REQUEST)
                 extractingBody<InvalidInputErrorResponse> {
@@ -138,7 +142,7 @@ internal class AuthEndpointTest(
                         RejectedField(fieldName = "password", rejectedValue = invalidRequest.password)
                     )
                 }
-                applicationUserRepository.findAll().toList().shouldBeEmpty()
+                applicationUserRepository.findAll().toList().find { it.login == invalidRequest.login }.shouldBeNull()
             }
         }
 
@@ -158,7 +162,7 @@ internal class AuthEndpointTest(
             Given {
                 jsonBody(request)
             } When {
-                post("$AUTH_ENDPOINT/register")
+                post("$AUTH_ENDPOINT_URL/register")
             } Then {
                 status(HttpStatus.CONFLICT)
                 applicationUserRepository.findByLogin(existingUser.login) shouldBe existingUser
@@ -176,7 +180,7 @@ internal class AuthEndpointTest(
     }
 
     private fun sampleValidUser(rawPassword: String) = ApplicationUser(
-        login = "testLogin",
+        login = SAMPLE_VALID_USER_LOGIN,
         passwordHash = passwordEncoder.encode(rawPassword),
         email = "testEmail@testDomain.com",
         role = UserRole.API_USER,

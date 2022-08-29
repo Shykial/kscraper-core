@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
-private const val SCRAPE_PATH = "$BASE_PATH/scrape"
+private const val SCRAPE_ENDPOINT_URL = "$BASE_PATH/scrape"
 
 @KScraperRestTest
 class ScrapingEndpointTest(
@@ -73,7 +73,7 @@ class ScrapingEndpointTest(
             queryParam("url", resourceUrl)
             queryParam("fields", extractingDetails.fieldName)
         } When {
-            get(SCRAPE_PATH)
+            get(SCRAPE_ENDPOINT_URL)
         } Then {
             status(HttpStatus.OK)
             extractingBody<ScrapedDataResponse> {

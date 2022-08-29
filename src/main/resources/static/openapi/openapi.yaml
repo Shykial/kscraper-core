@@ -283,7 +283,7 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /administrative/change-account-state/:
+  /administrative/change-account-state:
     put:
       tags:
         - Admin Operations

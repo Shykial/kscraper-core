@@ -1,4 +1,4 @@
-package com.shykial.kScraperCore.security
+package com.shykial.kScraperCore.service
 
 import com.shykial.kScraperCore.exception.NotFoundException
 import com.shykial.kScraperCore.helper.saveIn

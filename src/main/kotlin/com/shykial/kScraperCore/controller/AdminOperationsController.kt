@@ -3,7 +3,7 @@ package com.shykial.kScraperCore.controller
 import com.shykial.kScraperCore.extension.runSuspend
 import com.shykial.kScraperCore.helper.AllowedForAdmin
 import com.shykial.kScraperCore.helper.RestScope
-import com.shykial.kScraperCore.security.AdminOperationsService
+import com.shykial.kScraperCore.service.AdminOperationsService
 import generated.com.shykial.kScraperCore.apis.AdminOperationsApi
 import generated.com.shykial.kScraperCore.models.ChangeAccountStateRequest
 import generated.com.shykial.kScraperCore.models.ChangeUserEmailRequest
