@@ -64,5 +64,5 @@ jasypt:
 
 logging:
   level:
-    org.springframework.data.mongodb.core.ReactiveMongoTemplate: INFO
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
     com.shykial.kScraperCore.staticImplementation: DEBUG
