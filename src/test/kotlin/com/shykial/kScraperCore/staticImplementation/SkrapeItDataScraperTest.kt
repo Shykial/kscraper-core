@@ -4,7 +4,7 @@ import com.shykial.kScraperCore.helper.resource.ResponseMapping
 import com.shykial.kScraperCore.helper.resource.SupportedDomain
 import com.shykial.kScraperCore.model.entity.DomainRequestDetails
 import com.shykial.kScraperCore.model.entity.ExtractingDetails
-import io.kotest.matchers.maps.shouldContain
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.mockkConstructor
@@ -39,13 +39,16 @@ internal class SkrapeItDataScraperTest {
         extractingDetails: ExtractingDetails,
         responseMapping: ResponseMapping
     ) = runTest {
+        // given
         coEvery { anyConstructed<Scraper<Request>>().scrape() } returns resultWithBody(responseMapping.htmlContent)
+        // when
         val scrapedData = SkrapeItDataScraper.scrapeForData(
             resourceUrl = "",
             domainRequestDetails = domainRequestDetailsMock,
             extractingDetails = listOf(extractingDetails)
         )
-        scrapedData.scrapedFields shouldContain (extractingDetails to responseMapping.expectedFieldValue)
+        // then
+        scrapedData.scrapedFields shouldBe mapOf(extractingDetails to responseMapping.expectedFieldValue)
     }
 
     private fun responseMappingsSource() = enumValues<SupportedDomain>()

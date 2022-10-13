@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository
 @Repository
 interface DomainRequestDetailsRepository : CoroutineCrudRepository<DomainRequestDetails, String> {
     suspend fun findByDomainName(domainName: String): DomainRequestDetails?
-
-    suspend fun findByRequestTimeoutInMillis(timeoutInMillis: Int): DomainRequestDetails?
 }
