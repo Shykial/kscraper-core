@@ -1,0 +1,2 @@
+src/test/resources/html-responses/** linguist-vendored
+src/main/resources/static/openapi/kotlin-spring-custom-template/** linguist-vendored
